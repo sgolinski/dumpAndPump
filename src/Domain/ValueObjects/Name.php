@@ -3,6 +3,7 @@
 namespace App\Domain\ValueObjects;
 
 use App\Application\Validation\Blacklisted;
+use InvalidArgumentException;
 
 class Name
 {
@@ -27,7 +28,7 @@ class Name
     private function ensureNameIsAllowed(string $name): void
     {
         if (in_array(strtolower($name), Blacklisted::NAMES)) {
-            throw new \InvalidArgumentException('Name is blacklisted');
+            throw new InvalidArgumentException('Name is blacklisted');
         }
     }
 }

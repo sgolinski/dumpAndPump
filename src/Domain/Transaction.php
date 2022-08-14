@@ -2,6 +2,7 @@
 
 namespace App\Domain;
 
+use App\Application\Validation\Allowed;
 use App\Domain\Event\HoldersWereAssigned;
 use App\Domain\Event\PotentialDumpAndPumpRecognized;
 use App\Domain\Event\TransactionBlacklisted;
@@ -32,6 +33,7 @@ class Transaction extends AggregateRoot
     private bool $isDumpAndPump = false;
     private bool $isRegistered = false;
 
+
     public function __construct(Id $id)
     {
         $this->id = $id;
@@ -53,7 +55,6 @@ class Transaction extends AggregateRoot
             $chain,
             $price
         ));
-
         return $transaction;
     }
 
@@ -72,14 +73,12 @@ class Transaction extends AggregateRoot
         $this->recordAndApply(new TransactionWasRepeated());
     }
 
-
     public static function reconstitute(string $id, string $events): self
     {
         $transaction = new self(Id::fromString($id));
         foreach (unserialize($events) as $event) {
             $transaction->applyThat($event);
         }
-
         return $transaction;
     }
 
@@ -143,5 +142,18 @@ class Transaction extends AggregateRoot
     public function applyTransactionCompleted(TransactionCompleted $event): void
     {
         $this->completed = true;
+    }
+
+    public function priceEqualTo(Price $price): bool
+    {
+        return $this->price == $price;
+    }
+
+    public function ensurePriceIsHighEnough(): bool
+    {
+        if ($this->price < Allowed::PRICE_PER_NAME[$this->exchangeChain->asString()]) {
+            return false;
+        }
+        return true;
     }
 }

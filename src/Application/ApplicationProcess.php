@@ -13,16 +13,14 @@ class ApplicationProcess
 
     public function invoke(): void
     {
-        $this->application->importAllTransactionsFromWebsite(1, 2);
-        $this->application->findRepeated();
-        $this->application->findBiggestTransactionDrops();
-        $this->application->assignHolders();
-        $this->application->transactionRepository->size();
+        $this->application->importAllTransactionsFromWebsite(1, 100);
     }
 
     public function processEvents(): void
     {
-        $this->application->assignHolders();
-        $this->application->transactionRepository->size();
+        $this->application->findRepeated();
+        $this->application->findBiggestTransactionDrops();
+//        $this->application->completeTransaction();
+//        $this->application->transactionRepository->size();
     }
 }

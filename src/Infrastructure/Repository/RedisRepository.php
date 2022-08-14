@@ -22,7 +22,8 @@ class RedisRepository
     {
         $events = $this->client->hget('complete', $id->asString());
         $transaction = new Transaction($id);
-        $transaction->reconstitute($events);
+        //todo
+        $transaction->reconstitute($id->asString(), $events);
         return $transaction;
     }
 

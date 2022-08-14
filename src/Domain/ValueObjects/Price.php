@@ -2,6 +2,8 @@
 
 namespace App\Domain\ValueObjects;
 
+use App\Application\Validation\Allowed;
+
 class Price
 {
     private float $price;
@@ -16,8 +18,5 @@ class Price
         return new self($price);
     }
 
-    public function asFloat(): float
-    {
-        return $this->price;
-    }
+
 }

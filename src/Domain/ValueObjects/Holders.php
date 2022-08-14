@@ -38,4 +38,8 @@ class Holders
         return (int)$number;
     }
 
+    public function trustedHolders(): bool
+    {
+        return $this->asInt() > Holders::MIN_AMOUNT_HOLDERS;
+    }
 }

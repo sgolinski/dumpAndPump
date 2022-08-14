@@ -1171,10 +1171,11 @@ class Blacklisted
         'apple', 'shintama', 'arc', 'hbc', 'riox', 'fame', 'mmr', 'fs', 'tr', 'mgk', 'fc', 'rw', 'lgbtq', 'dmt', 'zero', 'ii', 'returndao',
         'saudidoge', 'exm', 'arg', 'gpad', 'nptp', 'lc', 'daisy', 'unim', 'bsquidgrow', 'secret', 'baycdao', 'lup', 'cig', 'goat', 'ante',
         'sqt', 'dclub', 'dnl', 'ds', 'penispump', 'lyka',
-
     ];
 
     public const STATUSES = [
-        'complete', 'notComplete', 'blacklisted',
+        // sent, blackliste
+        // nie jest blacklisted i nie jest sent
+        'complete', 'notComplete', 'blacklisted','sent'
     ];
 }

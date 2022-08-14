@@ -20,11 +20,14 @@ class Application
 
     public RedisRepository $transactionRepository;
 
+    public WebElementService $service;
+
     public function __construct()
     {
         $this->pantherRepository = new PantherRepository();
         $this->inMemoryRepository = new InMemoryRepository();
         $this->transactionRepository = new RedisRepository();
+        $this->service = new WebElementService();
     }
 
     public function importAllTransactionsFromWebsite(
@@ -45,12 +48,14 @@ class Application
         $now = DateTime::createFromFormat('U.u', microtime(true));
         echo $currentUrl->asString() . ' ' . $now->format("m-d-Y H:i:s.u") . PHP_EOL;
         $transactions = $this->pantherRepository->findElements($currentUrl);
-        $imported = $this->inMemoryRepository->saveAllTransactions($transactions);
+        $imported = $this->service->transformElementsToTransactions($transactions);
+        $endPage = $command->endPage();
         foreach ($imported as $transaction) {
             $this->transactionRepository->ensureHasNoStatus($transaction);
         }
     }
 
+    // lapie czerowna linie na podstawie kilku transakcji np 5 malych ale daje sume jednej wiekszej
     public function findRepeated(): void
     {
         $this->findRepeatedTransactions(new FindDumpAndPumpTransaction());
@@ -59,6 +64,7 @@ class Application
     private function findRepeatedTransactions(FindDumpAndPumpTransaction $command): void
     {
         $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
+
         foreach ($potentialDumpAndPumpTransactions as $dumpAndPumpTransaction) {
             assert($dumpAndPumpTransaction instanceof Transaction);
             $dumpAndPumpTransaction->pumpAndDumpRecognized();
@@ -68,13 +74,13 @@ class Application
 
     public function findBiggestTransactionDrops(): void
     {
-        $this->findDropedTransactions(new FindBiggestDropTransactions());
+        $this->findDroppedTransactions(new FindBiggestDropTransactions());
     }
 
-    private function findDropedTransactions(FindBiggestDropTransactions $command): void
+    private function findDroppedTransactions(FindBiggestDropTransactions $command): void
     {
         $dropped = $this->inMemoryRepository->byPrice();
-
+// status
         foreach ($dropped as $transaction) {
             assert($transaction instanceof Transaction);
             $transaction->registerTransaction();
@@ -82,7 +88,7 @@ class Application
         }
     }
 
-    public function assignHolders(): void
+    public function completeTransaction(): void
     {
         $this->findAllNotCompletedTransactions();
     }
@@ -93,19 +99,31 @@ class Application
 
         foreach ($notCompleted as $transaction) {
             assert($transaction instanceof Transaction);
+            // url komenda
             $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $transaction->id()->asString());
+            // mega ważna walidacja
             $string = $this->pantherRepository->findOneElementOn($currentURl);
             $holders = Holders::fromString($string);
 
-            if ($holders->asInt() < Holders::MIN_AMOUNT_HOLDERS) {
-                $transaction->assignToBlackList($holders);
-                $this->transactionRepository->save('blacklisted', $transaction);
-                $this->transactionRepository->removeFrom('notComplete', $transaction);
+            if (!$holders->trustedHolders()) {
+                $this->putTransactionOnBlacklist($transaction, $holders);
                 continue;
             }
-            $transaction->completeTransaction();
-            $this->transactionRepository->save('complete', $transaction);
-            $this->transactionRepository->removeFrom('notComplete', $transaction);
+            $this->putTransactionOnComplete($transaction);
         }
+    }
+
+    private function putTransactionOnBlacklist(Transaction $transaction, Holders $holders): void
+    {
+        $transaction->assignToBlackList($holders);
+        $this->transactionRepository->save('blacklisted', $transaction);
+        $this->transactionRepository->removeFrom('notComplete', $transaction);
+    }
+
+    private function putTransactionOnComplete(Transaction $transaction): void
+    {
+        $transaction->completeTransaction();
+        $this->transactionRepository->save('complete', $transaction);
+        $this->transactionRepository->removeFrom('notComplete', $transaction);
     }
 }
