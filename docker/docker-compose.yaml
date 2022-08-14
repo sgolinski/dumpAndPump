@@ -6,7 +6,7 @@ networks:
 services:
   php-cli:
     build:
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       context: ..
     volumes:
       - ../:/mnt/app
