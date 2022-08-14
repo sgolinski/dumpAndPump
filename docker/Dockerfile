@@ -15,9 +15,10 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
 RUN apk add libzip-dev libzip zip libxml2-dev \
     && docker-php-ext-install zip xml opcache
 
-RUN apk add --no-cache pcre-dev $PHPIZE_DEPS \
-        && pecl install redis \
-        && docker-php-ext-enable redis.so
+RUN mkdir -p /usr/src/php/ext/redis; \
+	curl -fsSL https://pecl.php.net/get/redis --ipv4 | tar xvz -C "/usr/src/php/ext/redis" --strip 1; \
+	docker-php-ext-install redis
+
 
 COPY /opcache.ini /usr/local/etc/php/conf.d/
 
