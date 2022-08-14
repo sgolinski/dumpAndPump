@@ -3,8 +3,10 @@
 namespace App\Domain\Event;
 
 use App\Domain\ValueObjects\Id;
+use App\Infrastructure\DomainEvent;
+use DateTimeImmutable;
 
-class TransactionWasSent implements \App\Infrastructure\DomainEvent
+class TransactionWasSent implements DomainEvent
 {
     private Id $id;
 
@@ -16,5 +18,10 @@ class TransactionWasSent implements \App\Infrastructure\DomainEvent
     public function id(): Id
     {
         return $this->id;
+    }
+
+    public function occurredOn(): DateTimeImmutable
+    {
+        return new DateTimeImmutable();
     }
 }

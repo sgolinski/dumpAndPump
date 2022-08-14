@@ -16,7 +16,6 @@ use App\Domain\ValueObjects\Holders;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
-use App\Domain\ValueObjects\Url;
 use App\Infrastructure\AggregateRoot;
 
 class Transaction extends AggregateRoot
@@ -77,8 +76,9 @@ class Transaction extends AggregateRoot
     {
         $transaction = new self(Id::fromString($id));
         foreach (unserialize($events) as $event) {
-            $transaction->applyThat($event);
+            $transaction->recordAndApply($event);
         }
+
         return $transaction;
     }
 
@@ -106,11 +106,20 @@ class Transaction extends AggregateRoot
 
     public function registerTransaction(): void
     {
-        $this->recordAndApply(new TransactionWasRegistered());
+        $this->recordAndApply(new TransactionWasRegistered(
+                $this->id,
+                $this->name,
+                $this->exchangeChain,
+                $this->price
+            )
+        );
     }
 
     public function applyTransactionWasRegistered(TransactionWasRegistered $event): void
     {
+        $this->name = $event->name();
+        $this->price = $event->price();
+        $this->exchangeChain = $event->exchangeChain();
         $this->isRegistered = true;
     }
 
@@ -165,5 +174,15 @@ class Transaction extends AggregateRoot
     public function applyTransactionWasSent(TransactionWasSent $event): void
     {
         $this->isSent = true;
+    }
+
+    public function createMessage(): string
+    {
+        return "Name: " . $this->name->asString() . PHP_EOL .
+            "Drop Value: -" . $this->price->asFloat() . ' ' . $this->exchangeChain->asString() . PHP_EOL .
+            "Listing: https://www.coingecko.com/en/coins/" . $this->id()->asString() . PHP_EOL .
+            "Poocoin:  https://poocoin.app/tokens/" . $this->id->asString() . PHP_EOL .
+            'Token Sniffer: https://tokensniffer.com/token/' . $this->id()->asString() . PHP_EOL .
+            'Chain: ' . $this->exchangeChain->asString() . PHP_EOL;
     }
 }

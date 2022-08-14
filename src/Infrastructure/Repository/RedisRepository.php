@@ -22,7 +22,6 @@ class RedisRepository
     {
         $events = $this->client->hget('complete', $id->asString());
         $transaction = new Transaction($id);
-        //todo
         $transaction->reconstitute($id->asString(), $events);
         return $transaction;
     }
@@ -41,7 +40,10 @@ class RedisRepository
         return true;
     }
 
-    public function save(string $key, Transaction $transaction): void
+    public function save(
+        string      $key,
+        Transaction $transaction
+    ): void
     {
         $this->ensureCorrectKey($key);
 

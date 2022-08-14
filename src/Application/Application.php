@@ -114,7 +114,11 @@ class Application
         }
     }
 
-    private function putTransactionOnBlacklist(Transaction $transaction, Holders $holders, FillNotCompleteTransaction $command): void
+    private function putTransactionOnBlacklist(
+        Transaction                $transaction,
+        Holders                    $holders,
+        FillNotCompleteTransaction $command
+    ): void
     {
         $transaction->assignToBlackList($holders);
         $this->transactionRepository->save($command->blacklist(), $transaction);
