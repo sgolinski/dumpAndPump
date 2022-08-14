@@ -1,6 +1,6 @@
 version: "3.7"
 networks:
-  crawler:
+  dump-pump:
     driver: "bridge"
 
 services:
@@ -12,4 +12,4 @@ services:
       - ../:/mnt/app
     restart: always
     networks:
-      - crawler
+      - dump-pump

@@ -17,10 +17,7 @@ RUN apk add libzip-dev libzip zip libxml2-dev \
 
 COPY /opcache.ini /usr/local/etc/php/conf.d/
 
-RUN set -ex \&& apk --no-cache add \
-        postgresql-dev
-
-RUN docker-php-ext-install mysqli pdo pdo_mysql pdo_pgsql pgsql && docker-php-ext-enable mysqli
+RUN docker-php-ext-install pdo
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -39,13 +36,9 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"\
    && php -r "unlink('composer-setup.php');"
 
 # copy all files to the image
-ADD /Application Application
-ADD /Common Common
-ADD /Domain Domain
-ADD /Infrastructure Infrastructure
 ADD /public public
-ADD /Factory.php Factory.php
-ADD /tools tools
+ADD /src src
+ADD /test tests
 
 ADD /composer.json composer.json
 ADD /composer.lock composer.lock

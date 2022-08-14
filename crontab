@@ -1,3 +1,4 @@
-*/8 * * * * php /mnt/app/public/data_collect/index.php
+* * * * * php /mnt/app/public/App.php
+* * * * * sleep 10; php /mnt/app/public/ProcessEvents.php
 
 # always remeber the last line of a crontab file must eb an empty line
