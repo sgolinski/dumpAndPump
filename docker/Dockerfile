@@ -15,6 +15,10 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
 RUN apk add libzip-dev libzip zip libxml2-dev \
     && docker-php-ext-install zip xml opcache
 
+RUN apk add --no-cache pcre-dev $PHPIZE_DEPS \
+        && pecl install redis \
+        && docker-php-ext-enable redis.so
+
 COPY /opcache.ini /usr/local/etc/php/conf.d/
 
 RUN docker-php-ext-install pdo
@@ -38,7 +42,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"\
 # copy all files to the image
 ADD /public public
 ADD /src src
-ADD /test tests
+ADD /tests tests
 
 ADD /composer.json composer.json
 ADD /composer.lock composer.lock
