@@ -16,6 +16,7 @@ class RedisRepository
     public function __construct()
     {
         $this->client = new Client('dump-app');
+
     }
 
     public function byIdComplete(Id $id): Transaction
