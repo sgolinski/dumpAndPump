@@ -22,17 +22,17 @@ class Application
 
     public WebElementService $service;
 
+    public NotificationService $notificationService;
+
     public function __construct()
     {
         $this->pantherRepository = new PantherRepository();
         $this->inMemoryRepository = new InMemoryRepository();
         $this->transactionRepository = new RedisRepository();
+        $this->notificationService = new NotificationService();
     }
 
-    public function importAllTransactionsFromWebsite(
-        int $from,
-        int $till
-    ): void
+    public function importAllTransactionsFromWebsite(int $from): void
     {
         try {
             $this->importTransactions(new ImportTransaction($from));
@@ -56,7 +56,6 @@ class Application
                 $this->inMemoryRepository->remove($transaction->id()->asString());
             }
         }
-
     }
 
     public function findRepeated(): void
@@ -127,5 +126,21 @@ class Application
         $transaction->completeTransaction();
         $this->transactionRepository->save($command->complete(), $transaction);
         $this->transactionRepository->removeFrom($command->notComplete(), $transaction);
+    }
+
+    public function sendNotifications(): void
+    {
+        $this->sendNotificationsAboutCompleteTokens(new NotifyOnSlack());
+    }
+
+    private function sendNotificationsAboutCompleteTokens(NotifyOnSlack $command): void
+    {
+        $completed = $this->transactionRepository->findAll($command->complete());
+        $this->notificationService->sendNotificationsFor($completed);
+        foreach ($completed as $completeTransaction) {
+            $this->transactionRepository->save($command->sent(), $completeTransaction);
+            $this->transactionRepository->removeFrom($command->complete(), $completeTransaction);
+            $completeTransaction->sendTransaction();
+        }
     }
 }

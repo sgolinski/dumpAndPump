@@ -10,6 +10,7 @@ use App\Domain\Event\TransactionCompleted;
 use App\Domain\Event\TransactionWasCached;
 use App\Domain\Event\TransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
+use App\Domain\Event\TransactionWasSent;
 use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Holders;
 use App\Domain\ValueObjects\Id;
@@ -25,7 +26,6 @@ class Transaction extends AggregateRoot
     public Price $price;
     public ExchangeChain $exchangeChain;
     private Holders $holders;
-    private Url $url;
     private int $repetitions;
     private bool $completed = false;
     private bool $blacklisted = false;
@@ -129,7 +129,7 @@ class Transaction extends AggregateRoot
         $this->recordAndApply(new TransactionBlacklisted($this->id, $holders));
     }
 
-    public function applyTransactionBlacklisted(TransactionBlacklisted $event)
+    public function applyTransactionBlacklisted(TransactionBlacklisted $event): void
     {
         $this->blacklisted = true;
     }
@@ -155,5 +155,15 @@ class Transaction extends AggregateRoot
             return false;
         }
         return true;
+    }
+
+    public function sendTransaction(): void
+    {
+        $this->recordAndApply(new TransactionWasSent($this->id()));
+    }
+
+    public function applyTransactionWasSent(TransactionWasSent $event): void
+    {
+        $this->isSent = true;
     }
 }

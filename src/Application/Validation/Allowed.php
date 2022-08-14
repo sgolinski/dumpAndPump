@@ -10,7 +10,7 @@ class Allowed
 
     public const PRICE_PER_NAME =
         [
-            'wbnb' => 1.00,
+            'wbnb' => 7.00,
             'cake' => 760.00,
             'bnb' => 7.00,
             'usdc' => 2470.00,

@@ -14,7 +14,7 @@ class ApplicationProcess
     public function invoke(int $start, int $end): void
     {
         for ($i = $start; $i < $end; $i++) {
-            $this->application->importAllTransactionsFromWebsite($i, $end);
+            $this->application->importAllTransactionsFromWebsite($i);
             $this->application->findRepeated();
             $this->application->findBiggestTransactionDrops();
         }
@@ -22,9 +22,8 @@ class ApplicationProcess
 
     public function processEvents(): void
     {
-//        $this->application->findRepeated();
-//        $this->application->findBiggestTransactionDrops();
         $this->application->completeTransaction();
+        $this->application->sendNotifications();
         $this->application->transactionRepository->size();
     }
 }

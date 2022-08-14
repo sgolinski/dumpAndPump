@@ -36,7 +36,6 @@ class WebElementService
 
             if ($this->repository->isEmpty() || !$this->repository->hasId($key)) {
                 $this->repository->add($key, $transaction);
-
                 continue;
             }
 
