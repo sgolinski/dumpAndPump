@@ -106,11 +106,11 @@ class Application
             $string = $this->pantherRepository->findOneElementOn($currentURl);
             $holders = Holders::fromString($string);
 
-            if (!$holders->trustedHolders()) {
-                $this->putTransactionOnBlacklist($transaction, $holders, $command);
+            if ($holders->trustedHolders()) {
+                $this->putTransactionOnComplete($transaction, $command);
                 continue;
             }
-            $this->putTransactionOnComplete($transaction, $command);
+            $this->putTransactionOnBlacklist($transaction, $holders, $command);
         }
     }
 

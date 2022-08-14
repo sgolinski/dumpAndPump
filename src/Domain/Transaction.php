@@ -185,4 +185,9 @@ class Transaction extends AggregateRoot
             'Token Sniffer: https://tokensniffer.com/token/' . $this->id()->asString() . PHP_EOL .
             'Chain: ' . $this->exchangeChain->asString() . PHP_EOL;
     }
+
+    public function showRepetitions(): int
+    {
+        return $this->repetitions;
+    }
 }

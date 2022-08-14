@@ -33,8 +33,7 @@ class InMemoryRepository implements TransactionRepository
     {
         $repeated = [];
         foreach ($this->transactionsInCache as $transaction) {
-            // ile ma eventow typu Transaction Repeated
-            if (count($transaction->recordedEvents()) === 5) {
+            if ($transaction->showRepetitions() >= 5) {
                 $repeated[] = $transaction;
             }
         }

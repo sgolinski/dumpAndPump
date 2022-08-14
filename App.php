@@ -6,5 +6,5 @@ require_once 'vendor/autoload.php';
 
 $process = new ApplicationProcess();
 
-$process->invoke(1,5);
+$process->invoke(1,10);
 $process->processEvents();
