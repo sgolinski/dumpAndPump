@@ -14,19 +14,19 @@ class WebElementService
     public TransactionFactory $factory;
     public InMemoryRepository $repository;
 
-    public function __construct()
+    public function __construct(InMemoryRepository $repository)
     {
         $this->factory = new TransactionFactory();
-        $this->repository = new InMemoryRepository();
+        $this->repository = $repository;
     }
 
     public function transformElementsToTransactions(ArrayIterator $webElements): array
     {
         foreach ($webElements as $cache) {
-
             try {
                 $this->ensureCacheIsNotEmpty($cache);
                 $transaction = $this->factory->createTransaction($cache);
+
             } catch (Exception) {
                 continue;
             }
@@ -36,6 +36,7 @@ class WebElementService
 
             if ($this->repository->isEmpty() || !$this->repository->hasId($key)) {
                 $this->repository->add($key, $transaction);
+
                 continue;
             }
 
@@ -43,9 +44,9 @@ class WebElementService
             if ($currentTransaction->priceEqualTo($transaction->price())) {
                 continue;
             }
+
             $currentTransaction->noticeRepetitions();
         }
-
         return $this->repository->all();
     }
 
@@ -55,5 +56,4 @@ class WebElementService
             throw new InvalidArgumentException();
         }
     }
-
 }

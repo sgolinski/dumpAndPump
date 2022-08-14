@@ -146,12 +146,12 @@ class Transaction extends AggregateRoot
 
     public function priceEqualTo(Price $price): bool
     {
-        return $this->price == $price;
+        return $this->price->asFloat() === $price->asFloat();
     }
 
     public function ensurePriceIsHighEnough(): bool
     {
-        if ($this->price < Allowed::PRICE_PER_NAME[$this->exchangeChain->asString()]) {
+        if ($this->price->asFloat() < Allowed::PRICE_PER_NAME[$this->exchangeChain->asString()]) {
             return false;
         }
         return true;

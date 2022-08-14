@@ -11,9 +11,13 @@ class ApplicationProcess
         $this->application = new Application();
     }
 
-    public function invoke(): void
+    public function invoke(int $start, int $end): void
     {
-        $this->application->importAllTransactionsFromWebsite(1, 100);
+        for ($i = $start; $i < $end; $i++) {
+            $this->application->importAllTransactionsFromWebsite($i, $end);
+            $this->application->findRepeated();
+            $this->application->findBiggestTransactionDrops();
+        }
     }
 
     public function processEvents(): void

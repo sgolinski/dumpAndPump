@@ -27,7 +27,6 @@ class Application
         $this->pantherRepository = new PantherRepository();
         $this->inMemoryRepository = new InMemoryRepository();
         $this->transactionRepository = new RedisRepository();
-        $this->service = new WebElementService();
     }
 
     public function importAllTransactionsFromWebsite(
@@ -44,15 +43,16 @@ class Application
 
     private function importTransactions(ImportTransaction $command): void
     {
+        $this->service = new WebElementService($this->inMemoryRepository);
         $currentUrl = Url::fromString(Urls::FOR_COMMAND . $command->startPage());
         $now = DateTime::createFromFormat('U.u', microtime(true));
         echo $currentUrl->asString() . ' ' . $now->format("m-d-Y H:i:s.u") . PHP_EOL;
         $transactions = $this->pantherRepository->findElements($currentUrl);
-        $imported = $this->service->transformElementsToTransactions($transactions);
-        $endPage = $command->endPage();
-        foreach ($imported as $transaction) {
-            $this->transactionRepository->ensureHasNoStatus($transaction);
-        }
+        $this->service->transformElementsToTransactions($transactions);;
+//        foreach ($imported as $transaction) {
+//            $this->transactionRepository->ensureHasNoStatus($transaction);
+//        }
+
     }
 
     // lapie czerowna linie na podstawie kilku transakcji np 5 malych ale daje sume jednej wiekszej
@@ -74,13 +74,14 @@ class Application
 
     public function findBiggestTransactionDrops(): void
     {
+
         $this->findDroppedTransactions(new FindBiggestDropTransactions());
     }
 
     private function findDroppedTransactions(FindBiggestDropTransactions $command): void
     {
+
         $dropped = $this->inMemoryRepository->byPrice();
-// status
         foreach ($dropped as $transaction) {
             assert($transaction instanceof Transaction);
             $transaction->registerTransaction();

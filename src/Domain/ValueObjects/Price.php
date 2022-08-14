@@ -15,4 +15,9 @@ class Price
     {
         return new self($price);
     }
+
+    public function asFloat()
+    {
+        return $this->price;
+    }
 }
