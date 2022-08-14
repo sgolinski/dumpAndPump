@@ -69,4 +69,9 @@ class InMemoryRepository implements TransactionRepository
     {
         $this->transactionsInCache[$key] = $transaction;
     }
+
+    public function remove($key)
+    {
+        unset($this->transactionsInCache[$key]);
+    }
 }

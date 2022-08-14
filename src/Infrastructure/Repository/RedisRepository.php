@@ -27,7 +27,7 @@ class RedisRepository
         return $transaction;
     }
 
-    public function ensureHasNoStatus(Transaction $transaction): void
+    public function ensureHasAllowedStatus(Transaction $transaction): bool
     {
         $statuses = [];
         foreach (Allowed::STATUSES as $key) {
@@ -36,8 +36,9 @@ class RedisRepository
             }
         }
         if (in_array(Blacklisted::STATUSES, $statuses)) {
-            throw new InvalidArgumentException('Status not Allowed');
+            return false;
         }
+        return true;
     }
 
     public function save(string $key, Transaction $transaction): void

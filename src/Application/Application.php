@@ -48,10 +48,13 @@ class Application
         $now = DateTime::createFromFormat('U.u', microtime(true));
         echo $currentUrl->asString() . ' ' . $now->format("m-d-Y H:i:s.u") . PHP_EOL;
         $transactions = $this->pantherRepository->findElements($currentUrl);
-        $this->service->transformElementsToTransactions($transactions);;
-//        foreach ($imported as $transaction) {
-//            $this->transactionRepository->ensureHasNoStatus($transaction);
-//        }
+        $imported = $this->service->transformElementsToTransactions($transactions);;
+
+        foreach ($imported as $transaction) {
+            if (!$this->transactionRepository->ensureHasAllowedStatus($transaction)) {
+                $this->inMemoryRepository->remove($transaction->id()->asString());
+            }
+        }
 
     }
 
