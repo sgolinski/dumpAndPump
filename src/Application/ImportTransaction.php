@@ -2,27 +2,22 @@
 
 namespace App\Application;
 
+use App\Application\Validation\Urls;
+use App\Domain\ValueObjects\Url;
+
 class ImportTransaction
 {
-    private int $startPage;
-    private int $endPage;
+    private Url $url;
 
     public function __construct(
         int $startPage,
-        int $endPage
     )
     {
-        $this->startPage = $startPage;
-        $this->endPage = $endPage;
+        $this->url = Url::fromString(Urls::FOR_COMMAND . $startPage);
     }
 
-    public function startPage(): int
+    public function url(): Url
     {
-        return $this->startPage;
-    }
-
-    public function endPage(): int
-    {
-        return $this->endPage;
+        return $this->url;
     }
 }

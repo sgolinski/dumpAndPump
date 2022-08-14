@@ -46,12 +46,10 @@ class InMemoryRepository implements TransactionRepository
         $drops = [];
         foreach ($this->transactionsInCache as $transaction) {
             assert($transaction instanceof Transaction);
-            echo $transaction->id()->asString() . PHP_EOL;
             if ($transaction->ensurePriceIsHighEnough()) {
                 $drops[] = $transaction;
             }
         }
-        var_dump($drops);
         return $drops;
     }
 

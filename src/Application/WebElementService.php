@@ -50,7 +50,7 @@ class WebElementService
         return $this->repository->all();
     }
 
-    private function ensureCacheIsNotEmpty(mixed $cache)
+    private function ensureCacheIsNotEmpty(mixed $cache): void
     {
         if ($cache === null) {
             throw new InvalidArgumentException();

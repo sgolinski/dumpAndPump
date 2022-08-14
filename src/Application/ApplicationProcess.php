@@ -22,9 +22,9 @@ class ApplicationProcess
 
     public function processEvents(): void
     {
-        $this->application->findRepeated();
-        $this->application->findBiggestTransactionDrops();
-//        $this->application->completeTransaction();
-//        $this->application->transactionRepository->size();
+//        $this->application->findRepeated();
+//        $this->application->findBiggestTransactionDrops();
+        $this->application->completeTransaction();
+        $this->application->transactionRepository->size();
     }
 }

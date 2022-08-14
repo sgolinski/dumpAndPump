@@ -4,7 +4,10 @@ namespace App\Application;
 
 class FindDumpAndPumpTransaction
 {
-    public function __construct()
+    private string $status = 'notComplete';
+
+    public function status(): string
     {
+        return $this->status;
     }
 }
