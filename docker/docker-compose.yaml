@@ -1,0 +1,15 @@
+version: "3.7"
+networks:
+  crawler:
+    driver: "bridge"
+
+services:
+  php-cli:
+    build:
+      dockerfile: Dockerfile
+      context: ..
+    volumes:
+      - ../:/mnt/app
+    restart: always
+    networks:
+      - crawler
