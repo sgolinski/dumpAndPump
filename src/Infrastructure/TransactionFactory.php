@@ -46,7 +46,6 @@ class TransactionFactory
         if (in_array($id->asString(), Blacklisted::ADDRESSES, true)) {
             throw new InvalidArgumentException('Blacklisted!');
         }
-
         return $id;
     }
 
@@ -70,17 +69,13 @@ class TransactionFactory
         return $this->extractChainFrom($information[1]);
     }
 
-    private function extractPriceFrom(
-        string $float
-    ): Price
+    private function extractPriceFrom(string $float): Price
     {
         $strPrice = str_replace([','], [''], $float);
         return Price::fromFloat(round((float)$strPrice, 3));
     }
 
-    private function extractChainFrom(
-        string $data
-    ): ExchangeChain
+    private function extractChainFrom(string $data): ExchangeChain
     {
         return ExchangeChain::fromString(strtolower($data));
     }

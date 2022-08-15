@@ -14,7 +14,7 @@ class HoldersWereAssigned implements DomainEvent
     private DateTimeImmutable $occurredOn;
 
     public function __construct(
-        Id $id,
+        Id     $id,
         string $holders
     )
     {

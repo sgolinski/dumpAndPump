@@ -18,6 +18,8 @@ use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Infrastructure\AggregateRoot;
 
+/*TODO class need to be refactored*/
+
 class Transaction extends AggregateRoot
 {
     public Id $id;

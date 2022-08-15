@@ -2,7 +2,7 @@
 
 namespace App\Application;
 
-class FindDumpAndPumpTransaction
+class FindBiggestSaleTransaction
 {
     private string $status = 'notComplete';
 

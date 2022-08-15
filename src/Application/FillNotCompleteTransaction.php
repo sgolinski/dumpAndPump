@@ -8,7 +8,6 @@ class FillNotCompleteTransaction
     private string $blacklist = 'blacklisted';
     private string $complete = 'complete';
 
-
     public function notComplete(): string
     {
         return $this->notComplete;

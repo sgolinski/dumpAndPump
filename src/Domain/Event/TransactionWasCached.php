@@ -16,12 +16,11 @@ class TransactionWasCached implements DomainEvent
     private ExchangeChain $chain;
     private Price $price;
 
-
     public function __construct(
-        Id    $id,
-        Name  $name,
+        Id            $id,
+        Name          $name,
         ExchangeChain $chain,
-        Price $price,
+        Price         $price,
     )
     {
         $this->id = $id;

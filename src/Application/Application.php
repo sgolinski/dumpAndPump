@@ -32,10 +32,10 @@ class Application
         $this->service = new WebElementService($this->inMemoryRepository);
     }
 
-    public function importAllTransactionsFromWebsite(int $from): void
+    public function importAllTransactionsFromWebsite(int $number): void
     {
         try {
-            $this->importTransactionsFrom(new ImportTransaction($from));
+            $this->importTransactionsFrom(new ImportTransaction($number));
         } catch (Exception $exception) {
             echo $exception->getMessage();
         }
@@ -64,10 +64,10 @@ class Application
 
     public function noteRepeatedTransactions(): void
     {
-        $this->findRepeatedTransactions(new FindDumpAndPumpTransaction());
+        $this->findRepeatedTransactions(new FindPotentialDumpAndPumpTransaction());
     }
 
-    private function findRepeatedTransactions(FindDumpAndPumpTransaction $command): void
+    private function findRepeatedTransactions(FindPotentialDumpAndPumpTransaction $command): void
     {
         $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
 
@@ -80,10 +80,10 @@ class Application
 
     public function findBiggestTransactionDrops(): void
     {
-        $this->filterSaleTransactions(new FindBiggestDropTransactions());
+        $this->filterSaleTransactions(new FindBiggestSaleTransaction());
     }
 
-    private function filterSaleTransactions(FindBiggestDropTransactions $command): void
+    private function filterSaleTransactions(FindBiggestSaleTransaction $command): void
     {
         $saleTransactions = $this->inMemoryRepository->byPrice();
         foreach ($saleTransactions as $saleTransaction) {
@@ -100,9 +100,9 @@ class Application
 
     private function fillAllNotCompletedTransactions(FillNotCompleteTransaction $command): void
     {
-        $notCompletedTransactions = $this->transactionRepository->findAll($command->notComplete());
+        $notCompleteTransactions = $this->transactionRepository->findAll($command->notComplete());
 
-        foreach ($notCompletedTransactions as $notCompletedTransaction) {
+        foreach ($notCompleteTransactions as $notCompletedTransaction) {
             assert($notCompletedTransaction instanceof Transaction);
 
             $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $notCompletedTransaction->id()->asString());
@@ -142,9 +142,9 @@ class Application
 
     private function sendNotificationsAboutCompleteTokens(NotifyOnSlack $command): void
     {
-        $completed = $this->transactionRepository->findAll($command->complete());
-        $this->notificationService->sendNotificationsFor($completed);
-        foreach ($completed as $completeTransaction) {
+        $completeTransactions = $this->transactionRepository->findAll($command->complete());
+        $this->notificationService->sendNotificationsFor($completeTransactions);
+        foreach ($completeTransactions as $completeTransaction) {
             $this->transactionRepository->save($command->sent(), $completeTransaction);
             $this->transactionRepository->removeFrom($command->complete(), $completeTransaction);
             $completeTransaction->sendNotification();

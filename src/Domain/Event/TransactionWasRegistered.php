@@ -16,7 +16,6 @@ class TransactionWasRegistered implements DomainEvent
     private ExchangeChain $exchangeChain;
     private Price $price;
 
-
     public function __construct(
         Id            $id,
         Name          $name,

@@ -9,9 +9,7 @@ class ImportTransaction
 {
     private Url $url;
 
-    public function __construct(
-        int $startPage,
-    )
+    public function __construct(int $startPage)
     {
         $this->url = Url::fromString(Urls::FOR_COMMAND . $startPage);
     }

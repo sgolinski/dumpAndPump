@@ -5,7 +5,6 @@ namespace App\Application;
 use App\Domain\Transaction;
 use App\Infrastructure\Repository\InMemoryRepository;
 use App\Infrastructure\TransactionFactory;
-use ArrayIterator;
 use Exception;
 use InvalidArgumentException;
 

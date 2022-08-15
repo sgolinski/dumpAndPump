@@ -16,7 +16,7 @@ class Price
         return new self($price);
     }
 
-    public function asFloat()
+    public function asFloat(): float
     {
         return $this->price;
     }

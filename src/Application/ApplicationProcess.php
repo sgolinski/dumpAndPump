@@ -24,6 +24,5 @@ class ApplicationProcess
     {
         $this->application->completeTransaction();
         $this->application->sendNotifications();
-        $this->application->transactionRepository->size();
     }
 }

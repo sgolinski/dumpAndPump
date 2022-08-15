@@ -18,13 +18,11 @@ class RedisRepository
     {
         try {
             $this->client = new Client([
-                'host' => 'redis' // docker container name, app_redis
+                'host' => 'redis'
             ]);
         } catch (Exception $exception) {
             echo 'Not connected';
         }
-
-
     }
 
     public function byIdComplete(Id $id): Transaction
@@ -79,7 +77,6 @@ class RedisRepository
         foreach ($serialized as $key => $string) {
             $transactions[] = Transaction::reconstitute($key, $string);
         }
-
         return $transactions;
     }
 
