@@ -62,7 +62,7 @@ class Application
         }
     }
 
-    public function findRepeated(): void
+    public function noteRepeatedTransactions(): void
     {
         $this->findRepeatedTransactions(new FindDumpAndPumpTransaction());
     }
@@ -80,11 +80,10 @@ class Application
 
     public function findBiggestTransactionDrops(): void
     {
-
-        $this->findDroppedTransactions(new FindBiggestDropTransactions());
+        $this->filterSaleTransactions(new FindBiggestDropTransactions());
     }
 
-    private function findDroppedTransactions(FindBiggestDropTransactions $command): void
+    private function filterSaleTransactions(FindBiggestDropTransactions $command): void
     {
         $saleTransactions = $this->inMemoryRepository->byPrice();
         foreach ($saleTransactions as $saleTransaction) {
