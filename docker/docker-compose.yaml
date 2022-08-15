@@ -1,12 +1,7 @@
 version: "3.7"
 
 
-
 services:
-  application:
-    build:
-      context: ..
-      dockerfile: Dockerfile
   php-cli:
     build:
       dockerfile: Dockerfile
@@ -23,6 +18,7 @@ services:
     container_name: airflow-webserver
     restart: always
     build:
+      dockerfile: Dockerfile
       context: ..
     command: webserver
     ports:
@@ -37,6 +33,7 @@ services:
     container_name: airflow-init
     entrypoint: /bin/bash
     build:
+      dockerfile: Dockerfile
       context: ..
     command:
       - -c
