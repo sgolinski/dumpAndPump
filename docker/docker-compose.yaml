@@ -1,6 +1,8 @@
 version: "3.7"
 
 x-common:
+  build:
+    dockerfile: docker/Dockerfile
   image: apache/airflow:2.3.0
   user: "${AIRFLOW_UID}:0"
   env_file:
@@ -21,7 +23,6 @@ x-depends-on:
 services:
   php-cli:
     build:
-      dockerfile: docker/Dockerfile
       context: ..
     depends_on:
       - webserver
