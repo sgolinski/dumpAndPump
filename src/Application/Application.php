@@ -101,20 +101,20 @@ class Application
 
     private function fillAllNotCompletedTransactions(FillNotCompleteTransaction $command): void
     {
-        $notCompleted = $this->transactionRepository->findAll($command->notComplete());
+        $notCompletedTransactions = $this->transactionRepository->findAll($command->notComplete());
 
-        foreach ($notCompleted as $transaction) {
-            assert($transaction instanceof Transaction);
+        foreach ($notCompletedTransactions as $notCompletedTransaction) {
+            assert($notCompletedTransaction instanceof Transaction);
 
-            $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $transaction->id()->asString());
+            $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $notCompletedTransaction->id()->asString());
             $string = $this->pantherService->findOneElementOn($currentURl);
             $holdersAmount = Holders::fromString($string);
 
             if ($holdersAmount->enoughToTrust()) {
-                $this->putTransactionOnComplete($transaction, $command);
+                $this->putTransactionOnComplete($notCompletedTransaction, $command);
                 continue;
             }
-            $this->putTransactionOnBlacklist($transaction, $holdersAmount, $command);
+            $this->putTransactionOnBlacklist($notCompletedTransaction, $holdersAmount, $command);
         }
     }
 
