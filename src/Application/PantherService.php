@@ -17,8 +17,7 @@ class PantherService
 
     public function __construct()
     {
-        $this->client = Client::createChromeClient(null, null, [
-            'external_base_uri' => '75.119.146.43:8000']);
+        $this->client = Client::createChromeClient();
     }
 
     public function saveWebElements(Url $url): void
