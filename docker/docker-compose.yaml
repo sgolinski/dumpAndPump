@@ -3,7 +3,7 @@ version: "3.7"
 services:
   php-cli:
     build:
-      dockerfile: ./docker/Dockerfile
+      dockerfile: Dockerfile
       context: ..
     depends_on:
       - webserver
