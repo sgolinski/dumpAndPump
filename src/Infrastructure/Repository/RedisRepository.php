@@ -15,7 +15,7 @@ class RedisRepository
 
     public function __construct()
     {
-        $this->client = new Client('dump-app');
+        $this->client = new Client('redis');
 
     }
 
