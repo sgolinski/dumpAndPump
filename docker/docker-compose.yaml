@@ -22,6 +22,8 @@ services:
   postgres:
     image: postgres:13
     container_name: postgres
+    build:
+      context: ..
     ports:
       - "5434:5432"
     healthcheck:
@@ -33,6 +35,8 @@ services:
 
   scheduler:
     container_name: airflow-scheduler
+    build:
+      context: ..
     command: scheduler
     restart: on-failure
     ports:
@@ -41,6 +45,8 @@ services:
   webserver:
     container_name: airflow-webserver
     restart: always
+    build:
+        context: ..
     command: webserver
     ports:
       - "8080:8080"
