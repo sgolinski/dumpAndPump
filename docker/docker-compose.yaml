@@ -59,6 +59,8 @@ services:
   airflow-init:
     container_name: airflow-init
     entrypoint: /bin/bash
+    build:
+      context: ..
     command:
       - -c
       - |
