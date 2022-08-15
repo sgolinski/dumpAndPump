@@ -18,7 +18,7 @@ class RedisRepository
     {
         try {
             $this->client = new Client([
-                'host' => '127.0.01' // docker container name, app_redis
+                'host' => '127.0.0.1' // docker container name, app_redis
             ]);
         } catch (Exception $exception) {
             echo 'Not connected';
