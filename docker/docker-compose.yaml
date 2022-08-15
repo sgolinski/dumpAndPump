@@ -1,5 +1,6 @@
 version: "3.7"
 
+
 services:
   php-cli:
     build:
@@ -13,29 +14,6 @@ services:
     links:
       - redis
       - webserver
-  postgres:
-    image: postgres:13
-    container_name: postgres
-    build:
-      context: ..
-    ports:
-      - "5434:5432"
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "airflow" ]
-      interval: 5s
-      retries: 5
-    env_file:
-      - .env
-
-  scheduler:
-    container_name: airflow-scheduler
-    build:
-      context: ..
-    command: scheduler
-    restart: on-failure
-    ports:
-      - "8793:8793"
-
   webserver:
     container_name: airflow-webserver
     restart: always
