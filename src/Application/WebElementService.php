@@ -19,7 +19,7 @@ class WebElementService
         $this->repository = $repository;
     }
 
-    public function transformElementsToTransactions(array $webElements): array
+    public function createTransactionsFrom(array $webElements): array
     {
         foreach ($webElements as $webElement) {
             try {

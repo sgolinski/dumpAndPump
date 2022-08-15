@@ -115,7 +115,7 @@ final class FirefoxManager implements BrowserManagerInterface
     {
         return [
             'scheme' => 'http',
-            'host' => '75.119.146.43',
+            'host' => '127.0.0.1',
             'port' => $this->get_unused_tcp_port(),
             'path' => '/status',
             'capabilities' => [],
@@ -124,7 +124,7 @@ final class FirefoxManager implements BrowserManagerInterface
 
     private function get_unused_tcp_port()
     {
-        $address = '75.119.146.43';
+        $address = '127.0.0.1';
         // Create a new socket
         $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         // Bind the source address

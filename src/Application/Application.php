@@ -53,8 +53,7 @@ class Application
             $this->pantherService->getClient()->quit();
         }
 
-        $importedTransactions = $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
-
+        $importedTransactions = $this->service->createTransactionsFrom($this->pantherService->savedWebElements());
         foreach ($importedTransactions as $transaction) {
             if (!$this->transactionRepository->ensureHasAllowedStatus($transaction)) {
                 $this->inMemoryRepository->remove($transaction->id()->asString());

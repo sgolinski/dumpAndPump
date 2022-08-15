@@ -14,13 +14,21 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
 
 COPY /opcache.ini /usr/local/etc/php/conf.d/
 
-RUN apk add libzip-dev firefox libzip zip libxml2-dev \
+RUN apk add libzip-dev libzip zip libxml2-dev \
     && docker-php-ext-install zip xml opcache
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && \
     install-php-extensions sockets gd
+
+RUN apt-get update                             \
+ && apt-get install -y --no-install-recommends \
+    ca-certificates curl firefox-esr           \
+ && rm -fr /var/lib/apt/lists/*                \
+ && curl -L https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz | tar xz -C /usr/local/bin \
+ && apt-get purge -y ca-certificates curl \
+
 
 
 RUN apk add --no-cache chromium chromium-chromedriver
