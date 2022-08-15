@@ -6,6 +6,7 @@ use App\Application\Validation\Allowed;
 use App\Application\Validation\Blacklisted;
 use App\Domain\Transaction;
 use App\Domain\ValueObjects\Id;
+use Exception;
 use InvalidArgumentException;
 use Predis\Client;
 
@@ -15,7 +16,14 @@ class RedisRepository
 
     public function __construct()
     {
-        $this->client = new Client('redis');
+        try {
+            $this->client = new Client([
+                'host' => 'redis' // docker container name, app_redis
+            ]);
+        } catch (Exception $exception) {
+            echo 'Not connected';
+        }
+
 
     }
 

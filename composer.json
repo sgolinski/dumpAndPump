@@ -21,7 +21,6 @@
         }
     ],
     "require": {
-        "ext-pdo": "*",
         "php-di/php-di": "^6.4",
         "predis/predis": "^2.0",
         "symfony/panther": "^2.0",
