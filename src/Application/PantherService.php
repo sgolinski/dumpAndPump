@@ -24,13 +24,11 @@ class PantherService
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-        sleep(1);
         try {
             $this->elements = $this->client->getCrawler()
                 ->filter(Selectors::FOR_TABLE)
                 ->filter(Selectors::FOR_TABLE_BODY)
                 ->children()->getIterator()->getArrayCopy();
-            $this->client->wait(1);
         } catch (Exception $exception) {
             $this->client->reload();
         }
@@ -52,13 +50,9 @@ class PantherService
 
     private function refreshClient(Url $url): void
     {
-        usleep(30000);
         $this->client->start();
-        usleep(30000);
         $this->client->get($url->asString());
-        usleep(30000);
         $this->client->refreshCrawler();
-        usleep(30000);
     }
 
     private function ensureIsNotBusy(Url $url): void

@@ -4,7 +4,6 @@ WORKDIR /mnt/app
 
 ENV PANTHER_NO_SANDBOX 1
 ENV PANTHER_CHROME_ARGUMENTS='--disable-dev-shm-usage'
-ENV PANTHER_CHROME_ARGUMENTS='--ignore-certificate-errors'
 
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \
@@ -13,7 +12,7 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
 
 COPY /opcache.ini /usr/local/etc/php/conf.d/
 
-RUN apk add libzip-dev libzip zip libxml2-dev \
+RUN apk add libzip-dev firefox libzip zip libxml2-dev \
     && docker-php-ext-install zip xml opcache
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
@@ -23,7 +22,10 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
 
 
 RUN apk add --no-cache chromium chromium-chromedriver
-ARG GECKODRIVER_VERSION=0.30.0
+
+
+ARG GECKODRIVER_VERSION=0.31.0
+
 RUN wget -q https://github.com/mozilla/geckodriver/releases/download/v$GECKODRIVER_VERSION/geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz; \
     tar -zxf geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz -C /usr/bin; \
     rm geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz
