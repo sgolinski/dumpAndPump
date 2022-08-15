@@ -15,11 +15,16 @@ class PantherRepository implements TransactionRepository
 {
     private Client $client;
 
+    public function __construct()
+    {
+        $this->client = Client::createChromeClient();
+    }
+
     public function findElements(Url $url): ?ArrayIterator
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-sleep(1);
+        sleep(1);
         try {
             return $this->client->getCrawler()
                 ->filter(Selectors::FOR_TABLE)
@@ -48,7 +53,6 @@ sleep(1);
 
     private function refreshClient(Url $url): void
     {
-        $this->client = Client::createChromeClient();
         usleep(30000);
         $this->client->start();
         usleep(30000);
