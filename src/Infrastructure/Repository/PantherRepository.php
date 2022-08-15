@@ -24,10 +24,10 @@ class PantherRepository implements TransactionRepository
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-        var_dump($this->client);
+
         sleep(1);
         try {
-            return $this->client->getCrawler()
+            $elements = $this->client->getCrawler()
                 ->filter(Selectors::FOR_TABLE)
                 ->filter(Selectors::FOR_TABLE_BODY)
                 ->children()
@@ -35,7 +35,7 @@ class PantherRepository implements TransactionRepository
         } catch (Exception $exception) {
             $this->client->reload();
         }
-        return null;
+        return $elements;
     }
 
     public function findOneElementOn(Url $url): string
