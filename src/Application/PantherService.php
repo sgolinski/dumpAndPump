@@ -4,7 +4,6 @@ namespace App\Application;
 
 use App\Application\Validation\Selectors;
 use App\Domain\ValueObjects\Url;
-use App\Infrastructure\Repository\InMemoryRepository;
 use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Panther\Client;
@@ -17,7 +16,8 @@ class PantherService
 
     public function __construct()
     {
-        $this->client = Client::createFirefoxClient(null, null, ['external_base_uri' => 'webserver']);
+        $this->client = Client::createFirefoxClient(null, null, ["capabilities" => ['external_base_uri' => 'webserver']]);
+        var_dump($this->client);
     }
 
     public function saveWebElements(Url $url): void
