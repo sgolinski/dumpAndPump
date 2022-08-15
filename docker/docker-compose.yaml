@@ -19,6 +19,19 @@ x-depends-on:
       condition: service_completed_successfully
 
 services:
+  php-cli:
+    build:
+      dockerfile: docker/Dockerfile
+      context: ..
+    depends_on:
+      - webserver
+    volumes:
+      - ../:/mnt/app
+    restart: always
+    links:
+      - redis
+      - webserver
+
   postgres:
     image: postgres:13
     container_name: postgres
@@ -67,18 +80,6 @@ services:
         mkdir -p /sources/logs /sources/dags /sources/plugins
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
         exec /entrypoint airflow version
-  php-cli:
-    build:
-      dockerfile: docker/Dockerfile
-      context: ..
-    depends_on:
-      - webserver
-    volumes:
-      - ../:/mnt/app
-    restart: always
-    links:
-      - redis
-      - webserver
   redis:
     image: redis:4.0
     container_name: app_pump
