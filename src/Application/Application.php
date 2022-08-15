@@ -49,13 +49,6 @@ class Application
         echo $command->url()->asString() . ' ' . $now->format("m-d-Y H:i:s.u") . PHP_EOL;
 
         $transactions = $this->pantherRepository->findElements($command->url());
-        if ($transactions == null) {
-            $this->pantherRepository = new PantherRepository();
-            $this->pantherRepository->getClient()->close();
-            $this->pantherRepository->getClient()->quit();
-            $this->importTransactions();
-
-        }
         $imported = $this->service->transformElementsToTransactions($transactions);;
 
         foreach ($imported as $transaction) {
