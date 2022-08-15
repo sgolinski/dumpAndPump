@@ -19,7 +19,7 @@ class PantherRepository implements TransactionRepository
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-var_dump($url);
+sleep(1);
         try {
             return $this->client->getCrawler()
                 ->filter(Selectors::FOR_TABLE)
