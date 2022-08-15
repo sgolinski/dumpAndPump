@@ -17,7 +17,7 @@ class PantherService
 
     public function __construct()
     {
-        $this->client = Client::createChromeClient();
+        $this->client = Client::createFirefoxClient();
     }
 
     public function saveWebElements(Url $url): void
