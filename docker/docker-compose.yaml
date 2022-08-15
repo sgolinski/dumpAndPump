@@ -4,7 +4,7 @@ version: "3.7"
 services:
   php-cli:
     build:
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       context: ..
     depends_on:
       - webserver
@@ -15,11 +15,9 @@ services:
       - redis
       - webserver
   webserver:
+    image: apache/airflow
     container_name: airflow-webserver
     restart: always
-    build:
-      dockerfile: Dockerfile
-      context: ..
     command: webserver
     ports:
       - "8080:8080"
@@ -28,19 +26,6 @@ services:
       interval: 30s
       timeout: 30s
       retries: 5
-
-  airflow-init:
-    container_name: airflow-init
-    entrypoint: /bin/bash
-    build:
-      dockerfile: Dockerfile
-      context: ..
-    command:
-      - -c
-      - |
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
-        exec /entrypoint airflow version
   redis:
     image: redis:4.0
     container_name: app_pump
