@@ -3,7 +3,6 @@
 namespace App\Application;
 
 use App\Application\Validation\Selectors;
-use App\Domain\Transaction;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
 use Exception;
@@ -14,13 +13,11 @@ use Symfony\Component\Panther\Client;
 class PantherService
 {
     private Client $client;
-    private InMemoryRepository $repository;
-    private array $elements;
+    private array $elements = [];
 
     public function __construct()
     {
         $this->client = Client::createChromeClient();
-        $this->repository = new InMemoryRepository();
     }
 
     public function saveWebElements(Url $url): void
@@ -33,7 +30,6 @@ class PantherService
                 ->filter(Selectors::FOR_TABLE)
                 ->filter(Selectors::FOR_TABLE_BODY)
                 ->children()->getIterator()->getArrayCopy();
-
             $this->client->wait(1);
         } catch (Exception $exception) {
             $this->client->reload();

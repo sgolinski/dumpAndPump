@@ -94,7 +94,7 @@ class Transaction extends AggregateRoot
         $this->repetitions++;
     }
 
-    public function pumpAndDumpRecognized(): void
+    public function recognizePumpAndDump(): void
     {
         $this->recordAndApply(new PotentialDumpAndPumpRecognized());
     }
@@ -133,7 +133,7 @@ class Transaction extends AggregateRoot
         $this->holders = $event->holders();
     }
 
-    public function assignToBlackList(string $holders): void
+    public function putOnBlacklist(string $holders): void
     {
         $this->recordAndApply(new TransactionBlacklisted($this->id, $holders));
     }
@@ -166,7 +166,7 @@ class Transaction extends AggregateRoot
         return true;
     }
 
-    public function sendTransaction(): void
+    public function sendNotification(): void
     {
         $this->recordAndApply(new TransactionWasSent($this->id()));
     }

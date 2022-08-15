@@ -29,21 +29,20 @@ class Application
         $this->inMemoryRepository = new InMemoryRepository();
         $this->transactionRepository = new RedisRepository();
         $this->notificationService = new NotificationService();
+        $this->service = new WebElementService($this->inMemoryRepository);
     }
 
     public function importAllTransactionsFromWebsite(int $from): void
     {
         try {
-            $this->importTransactions(new ImportTransaction($from));
+            $this->importTransactionsFrom(new ImportTransaction($from));
         } catch (Exception $exception) {
             echo $exception->getMessage();
         }
     }
 
-    private function importTransactions(ImportTransaction $command): void
+    private function importTransactionsFrom(ImportTransaction $command): void
     {
-        $this->service = new WebElementService($this->inMemoryRepository);
-
         $now = DateTime::createFromFormat('U.u', microtime(true));
         echo $command->url()->asString() . ' ' . $now->format("m-d-Y H:i:s.u") . PHP_EOL;
 
@@ -72,10 +71,10 @@ class Application
     {
         $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
 
-        foreach ($potentialDumpAndPumpTransactions as $dumpAndPumpTransaction) {
-            assert($dumpAndPumpTransaction instanceof Transaction);
-            $dumpAndPumpTransaction->pumpAndDumpRecognized();
-            $this->transactionRepository->save($command->status(), $dumpAndPumpTransaction);
+        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
+            assert($potentialDumpAndPumpTransaction instanceof Transaction);
+            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
+            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
         }
     }
 
@@ -91,7 +90,7 @@ class Application
         foreach ($dropped as $transaction) {
             assert($transaction instanceof Transaction);
             $transaction->registerTransaction();
-            $this->transactionRepository->save($command->status(), $transaction);
+            $this->transactionRepository->save($command->notComplete(), $transaction);
         }
     }
 
@@ -109,13 +108,13 @@ class Application
 
             $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $transaction->id()->asString());
             $string = $this->pantherService->findOneElementOn($currentURl);
-            $holders = Holders::fromString($string);
+            $holdersAmount = Holders::fromString($string);
 
-            if ($holders->trustedHolders()) {
+            if ($holdersAmount->enoughToTrust()) {
                 $this->putTransactionOnComplete($transaction, $command);
                 continue;
             }
-            $this->putTransactionOnBlacklist($transaction, $holders, $command);
+            $this->putTransactionOnBlacklist($transaction, $holdersAmount, $command);
         }
     }
 
@@ -125,7 +124,7 @@ class Application
         FillNotCompleteTransaction $command
     ): void
     {
-        $transaction->assignToBlackList($holders);
+        $transaction->putOnBlacklist($holders);
         $this->transactionRepository->save($command->blacklist(), $transaction);
         $this->transactionRepository->removeFrom($command->notComplete(), $transaction);
     }
@@ -149,7 +148,7 @@ class Application
         foreach ($completed as $completeTransaction) {
             $this->transactionRepository->save($command->sent(), $completeTransaction);
             $this->transactionRepository->removeFrom($command->complete(), $completeTransaction);
-            $completeTransaction->sendTransaction();
+            $completeTransaction->sendNotification();
         }
     }
 }
