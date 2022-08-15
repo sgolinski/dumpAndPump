@@ -17,7 +17,7 @@ class PantherService
 
     public function __construct()
     {
-        $this->client = Client::createFirefoxClient();
+        $this->client = Client::createFirefoxClient(null, null, ['external_base_uri' => 'webserver']);
     }
 
     public function saveWebElements(Url $url): void
