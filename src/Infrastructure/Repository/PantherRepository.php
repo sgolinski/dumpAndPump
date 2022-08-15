@@ -9,6 +9,7 @@ use ArrayIterator;
 use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Panther\Client;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class PantherRepository implements TransactionRepository
 {
@@ -18,6 +19,7 @@ class PantherRepository implements TransactionRepository
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
+        usleep(3000);
         try {
             return $this->client->getCrawler()
                 ->filter(Selectors::FOR_TABLE)
