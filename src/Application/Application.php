@@ -86,11 +86,11 @@ class Application
 
     private function findDroppedTransactions(FindBiggestDropTransactions $command): void
     {
-        $dropped = $this->inMemoryRepository->byPrice();
-        foreach ($dropped as $transaction) {
-            assert($transaction instanceof Transaction);
-            $transaction->registerTransaction();
-            $this->transactionRepository->save($command->notComplete(), $transaction);
+        $saleTransactions = $this->inMemoryRepository->byPrice();
+        foreach ($saleTransactions as $saleTransaction) {
+            assert($saleTransaction instanceof Transaction);
+            $saleTransaction->registerTransaction();
+            $this->transactionRepository->save($command->notComplete(), $saleTransaction);
         }
     }
 
@@ -107,8 +107,8 @@ class Application
             assert($notCompletedTransaction instanceof Transaction);
 
             $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $notCompletedTransaction->id()->asString());
-            $string = $this->pantherService->findOneElementOn($currentURl);
-            $holdersAmount = Holders::fromString($string);
+            $elementFrom = $this->pantherService->findOneElementOn($currentURl);
+            $holdersAmount = Holders::fromString($elementFrom);
 
             if ($holdersAmount->enoughToTrust()) {
                 $this->putTransactionOnComplete($notCompletedTransaction, $command);
