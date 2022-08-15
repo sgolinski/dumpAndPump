@@ -7,7 +7,6 @@ use App\Domain\Transaction;
 use App\Domain\ValueObjects\Holders;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
-use App\Infrastructure\Repository\PantherRepository;
 use App\Infrastructure\Repository\RedisRepository;
 use DateTime;
 use Exception;
@@ -16,7 +15,7 @@ class Application
 {
     private InMemoryRepository $inMemoryRepository;
 
-    private PantherRepository $pantherRepository;
+    private PantherService $pantherService;
 
     public RedisRepository $transactionRepository;
 
@@ -26,7 +25,7 @@ class Application
 
     public function __construct()
     {
-        $this->pantherRepository = new PantherRepository();
+        $this->pantherService = new PantherService();
         $this->inMemoryRepository = new InMemoryRepository();
         $this->transactionRepository = new RedisRepository();
         $this->notificationService = new NotificationService();
@@ -49,15 +48,15 @@ class Application
         echo $command->url()->asString() . ' ' . $now->format("m-d-Y H:i:s.u") . PHP_EOL;
 
         try {
-            $transactions = $this->pantherRepository->findElements($command->url());
-        } catch (Exception $exception) {
-            $this->pantherRepository->getClient()->close();
-            $this->pantherRepository->getClient()->quit();
+            $this->pantherService->saveWebElements($command->url());
+        } catch (Exception) {
+            $this->pantherService->getClient()->close();
+            $this->pantherService->getClient()->quit();
         }
 
-        $imported = $this->service->transformElementsToTransactions($transactions);;
+        $importedTransactions = $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
 
-        foreach ($imported as $transaction) {
+        foreach ($importedTransactions as $transaction) {
             if (!$this->transactionRepository->ensureHasAllowedStatus($transaction)) {
                 $this->inMemoryRepository->remove($transaction->id()->asString());
             }
@@ -109,7 +108,7 @@ class Application
             assert($transaction instanceof Transaction);
 
             $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $transaction->id()->asString());
-            $string = $this->pantherRepository->findOneElementOn($currentURl);
+            $string = $this->pantherService->findOneElementOn($currentURl);
             $holders = Holders::fromString($string);
 
             if ($holders->trustedHolders()) {

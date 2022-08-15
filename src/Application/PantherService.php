@@ -1,41 +1,43 @@
 <?php
 
-namespace App\Infrastructure\Repository;
+namespace App\Application;
 
 use App\Application\Validation\Selectors;
 use App\Domain\Transaction;
 use App\Domain\ValueObjects\Url;
-use ArrayIterator;
+use App\Infrastructure\Repository\InMemoryRepository;
 use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Panther\Client;
 
 
-class PantherRepository implements TransactionRepository
+class PantherService
 {
     private Client $client;
+    private InMemoryRepository $repository;
+    private array $elements;
 
     public function __construct()
     {
         $this->client = Client::createChromeClient();
+        $this->repository = new InMemoryRepository();
     }
 
-    public function findElements(Url $url): ?ArrayIterator
+    public function saveWebElements(Url $url): void
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-
         sleep(1);
         try {
-            $elements = $this->client->getCrawler()
+            $this->elements = $this->client->getCrawler()
                 ->filter(Selectors::FOR_TABLE)
                 ->filter(Selectors::FOR_TABLE_BODY)
-                ->children()
-                ->getIterator();
+                ->children()->getIterator()->getArrayCopy();
+
+            $this->client->wait(1);
         } catch (Exception $exception) {
             $this->client->reload();
         }
-        return $elements;
     }
 
     public function findOneElementOn(Url $url): string
@@ -76,8 +78,9 @@ class PantherRepository implements TransactionRepository
         return $this->client;
     }
 
-    public function save(Transaction $transaction)
+    public function savedWebElements(): array
     {
-        // TODO: Implement save() method.
+        return $this->elements;
     }
+
 }

@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Transaction;
+use ArrayIterator;
 
 class InMemoryRepository implements TransactionRepository
 {
@@ -71,4 +72,5 @@ class InMemoryRepository implements TransactionRepository
     {
         unset($this->transactionsInCache[$key]);
     }
+
 }

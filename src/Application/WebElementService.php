@@ -20,17 +20,16 @@ class WebElementService
         $this->repository = $repository;
     }
 
-    public function transformElementsToTransactions(ArrayIterator $webElements): array
+    public function transformElementsToTransactions(array $webElements): array
     {
-        foreach ($webElements as $cache) {
+        foreach ($webElements as $webElement) {
             try {
-                $this->ensureCacheIsNotEmpty($cache);
-                $transaction = $this->factory->createTransaction($cache);
+                $this->ensureCacheIsNotEmpty($webElement);
+                $transaction = $this->factory->createTransaction($webElement);
 
             } catch (Exception) {
                 continue;
             }
-
             assert($transaction instanceof Transaction);
             $key = $transaction->id()->asString();
 
