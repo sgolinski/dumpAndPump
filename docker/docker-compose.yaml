@@ -15,17 +15,7 @@ services:
       - redis
       - webserver
   webserver:
-    image: apache/airflow
-    container_name: airflow-webserver
-    restart: always
-    command: webserver
-    ports:
-      - "8080:8080"
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://localhost:8080/health" ]
-      interval: 30s
-      timeout: 30s
-      retries: 5
+    image: nginx:latest
   redis:
     image: redis:4.0
     container_name: app_pump
