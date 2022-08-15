@@ -17,7 +17,6 @@ class PantherRepository implements TransactionRepository
 
     public function findElements(Url $url): ?ArrayIterator
     {
-        $this->client->start();
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
 
@@ -50,8 +49,11 @@ class PantherRepository implements TransactionRepository
     private function refreshClient(Url $url): void
     {
         $this->client = Client::createChromeClient();
+        usleep(30000);
         $this->client->start();
+        usleep(30000);
         $this->client->get($url->asString());
+        usleep(30000);
         $this->client->refreshCrawler();
         usleep(30000);
     }
