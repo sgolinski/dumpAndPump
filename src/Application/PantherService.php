@@ -19,11 +19,11 @@ class PantherService
         $this->client = Client::createChromeClient();
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-        echo $this->client->ping().PHP_EOL;
-        $this->elements = $this->client->getCrawler()
+        echo $this->client->ping() . PHP_EOL;
+        var_dump($this->client->getCrawler()
             ->filter(Selectors::FOR_TABLE)
             ->filter(Selectors::FOR_TABLE_BODY)
-            ->children()->getIterator()->getArrayCopy();
+            ->children()->getIterator()->getArrayCopy());
     }
 
     public function findOneElementOn(Url $url): string
