@@ -29,6 +29,8 @@ class PantherService
                 ->filter(Selectors::FOR_TABLE)
                 ->filter(Selectors::FOR_TABLE_BODY)
                 ->children()->getIterator()->getArrayCopy();
+            var_dump($this->elements);
+            die;
         } catch (Exception $exception) {
             $this->client->reload();
         }
