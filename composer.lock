@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "92ab2c02c0272f81be81709d468f67e9",
+    "content-hash": "96af13d065079a3d5202d63595b4b800",
     "packages": [
         {
             "name": "alek13/slack",
@@ -4569,10 +4569,9 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "ext-pdo": "*",
         "ext-sockets": "*",
         "ext-curl": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }
