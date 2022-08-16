@@ -112,6 +112,12 @@ final class ChromeManager implements BrowserManagerInterface
         if (!($_SERVER['PANTHER_NO_HEADLESS'] ?? false)) {
             $args[] = '--headless';
             $args[] = '--window-size=1200,1100';
+            $args[] = '--whitelisted-ips=';
+            $args[] = '--accept-resource-provider';
+            $args[] =    '--allow-insecure-localhost';
+            $args[] = '--ignore-certificate-errors-spki-lis';
+            $args[] =  '--no-proxy-server';
+            $args[] = '--incognito';
             $args[] = '--disable-gpu';
         }
 
@@ -152,18 +158,7 @@ final class ChromeManager implements BrowserManagerInterface
             'host' => '127.0.0.1',
             'port' => $this->get_unused_tcp_port(),
             'path' => '/status',
-            'chromedriver_arguments' => [
-                '--whitelisted-ips=',
-                '--headless',
-                '--disable-gpu',
-                '--no-sandbox',
-                '--accept-resource-provider',
-                '--allow-insecure-localhost',
-                '--ignore-certificate-errors-spki-lis',
-                '--no-proxy-server',
-                '--incognito'
-
-            ],
+            'chromedriver_arguments' => [],
             'capabilities' => [],
         ];
     }

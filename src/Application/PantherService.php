@@ -20,7 +20,7 @@ class PantherService
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
 
-var_dump($this->client);
+var_dump($this->client); die;
         $this->elements = $this->client->getCrawler()
             ->filter(Selectors::FOR_TABLE)
             ->filter(Selectors::FOR_TABLE_BODY)
