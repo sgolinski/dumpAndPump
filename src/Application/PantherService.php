@@ -16,7 +16,7 @@ class PantherService
 
     public function saveWebElements(Url $url): void
     {
-        $this->client = Client::createChromeClient();
+        $this->client = Client::createFirefoxClient();
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
 
