@@ -20,7 +20,7 @@ class PantherService
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
         echo $this->client->ping() . PHP_EOL;
-        usleep(3000);
+        usleep(300000);
         var_dump($this->client->getCrawler()
             ->filter(Selectors::FOR_TABLE)
             ->filter(Selectors::FOR_TABLE_BODY)
