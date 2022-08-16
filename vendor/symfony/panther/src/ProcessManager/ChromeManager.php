@@ -115,10 +115,7 @@ final class ChromeManager implements BrowserManagerInterface
             $args[] = '--whitelisted-ips=';
             $args[] = '--accept-resource-provider';
             $args[] =    '--allow-insecure-localhost';
-            $args[] = '--ignore-certificate-errors-spki-lis';
             $args[] =  '--no-proxy-server';
-            $args[] = '--incognito';
-            $args[] = '--disable-gpu';
             $args[] = '--enable-javascript'
             ;
         }
