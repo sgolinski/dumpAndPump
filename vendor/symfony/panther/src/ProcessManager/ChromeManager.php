@@ -114,7 +114,6 @@ final class ChromeManager implements BrowserManagerInterface
             $args[] = '--window-size=1200,1100';
             $args[] = '--whitelisted-ips=';
             $args[] = '--accept-resource-provider';
-            $args[] =    '--allow-insecure-localhost';
             $args[] =  '--no-proxy-server';
             $args[] = '--enable-javascript'
             ;
