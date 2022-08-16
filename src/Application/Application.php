@@ -45,14 +45,7 @@ class Application
     {
         $now = DateTime::createFromFormat('U.u', microtime(true));
         echo $command->url()->asString() . ' ' . $now->format("m-d-Y H:i:s.u") . PHP_EOL;
-
-        try {
-            $this->pantherService->saveWebElements($command->url());
-        } catch (Exception) {
-            $this->pantherService->getClient()->close();
-            $this->pantherService->getClient()->quit();
-        }
-
+        $this->pantherService->saveWebElements($command->url());
         $importedTransactions = $this->service->createTransactionsFrom($this->pantherService->savedWebElements());
         foreach ($importedTransactions as $transaction) {
             if (!$this->transactionRepository->ensureHasAllowedStatus($transaction)) {

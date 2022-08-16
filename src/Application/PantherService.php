@@ -14,27 +14,16 @@ class PantherService
     private Client $client;
     private array $elements = [];
 
-    public function __construct()
-    {
-        $this->client = Client::createChromeClient();
-
-    }
-
     public function saveWebElements(Url $url): void
     {
+        $this->client = Client::createChromeClient();
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-        sleep(2);
-        try {
-            $this->elements = $this->client->getCrawler()
-                ->filter(Selectors::FOR_TABLE)
-                ->filter(Selectors::FOR_TABLE_BODY)
-                ->children()->getIterator()->getArrayCopy();
-            var_dump($this->elements);
-            die;
-        } catch (Exception $exception) {
-            $this->client->reload();
-        }
+
+        $this->elements = $this->client->getCrawler()
+            ->filter(Selectors::FOR_TABLE)
+            ->filter(Selectors::FOR_TABLE_BODY)
+            ->children()->getIterator()->getArrayCopy();
     }
 
     public function findOneElementOn(Url $url): string
