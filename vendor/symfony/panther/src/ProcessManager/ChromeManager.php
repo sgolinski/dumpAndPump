@@ -29,7 +29,19 @@ final class ChromeManager implements BrowserManagerInterface
 
     private Process $process;
     private array $arguments;
-    private array $options;
+    private array $options = [
+        '--whitelisted-ips=',
+        '--headless',
+        '--disable-gpu',
+        'start-maximized',
+        '--no-sandbox',
+        '--accept-resource-provider',
+        '--allow-insecure-localhost',
+        '--ignore-certificate-errors-spki-lis',
+        '--no-proxy-server',
+        '--incognito'
+
+    ];
 
     /**
      * @throws \RuntimeException
@@ -46,11 +58,11 @@ final class ChromeManager implements BrowserManagerInterface
      */
     public function start(): WebDriver
     {
-        $url = $this->options['scheme'].'://'.$this->options['host'].':'.$this->options['port'];
+        $url = $this->options['scheme'] . '://' . $this->options['host'] . ':' . $this->options['port'];
         if (!$this->process->isRunning()) {
             $this->checkPortAvailable($this->options['host'], $this->options['port']);
             $this->process->start();
-            $this->waitUntilReady($this->process, $url.$this->options['path'], 'chrome');
+            $this->waitUntilReady($this->process, $url . $this->options['path'], 'chrome');
         }
 
         $capabilities = DesiredCapabilities::chrome();
@@ -126,7 +138,7 @@ final class ChromeManager implements BrowserManagerInterface
     private function createProcess(string $chromeDriverBinary): Process
     {
         $command = array_merge(
-            [$chromeDriverBinary, '--port='.$this->options['port']],
+            [$chromeDriverBinary, '--port=' . $this->options['port']],
             $this->options['chromedriver_arguments']
         );
 
@@ -140,10 +152,22 @@ final class ChromeManager implements BrowserManagerInterface
             'host' => '127.0.0.1',
             'port' => $this->get_unused_tcp_port(),
             'path' => '/status',
-            'chromedriver_arguments' => [],
+            'chromedriver_arguments' => [
+                '--whitelisted-ips=',
+                '--headless',
+                '--disable-gpu',
+                '--no-sandbox',
+                '--accept-resource-provider',
+                '--allow-insecure-localhost',
+                '--ignore-certificate-errors-spki-lis',
+                '--no-proxy-server',
+                '--incognito'
+
+            ],
             'capabilities' => [],
         ];
     }
+
     private function get_unused_tcp_port()
     {
         $address = '127.0.0.1';

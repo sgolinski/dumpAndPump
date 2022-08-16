@@ -16,23 +16,11 @@ class PantherService
 
     public function saveWebElements(Url $url): void
     {
-        $this->client = Client::createChromeClient(null, null, [
-            'chromedriver_arguments' => [
-                '--whitelisted-ips=',
-                '--headless',
-                '--disable-gpu',
-                'window-size=1024,768',
-                '--no-sandbox',
-                '--accept-resource-provider',
-                '--allow-insecure-localhost',
-                '--ignore-certificate-errors-spki-lis',
-                '--no-proxy-server'
-            ]
-        ]);
+        $this->client = Client::createChromeClient();
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
 
-
+var_dump($this->client);
         $this->elements = $this->client->getCrawler()
             ->filter(Selectors::FOR_TABLE)
             ->filter(Selectors::FOR_TABLE_BODY)
