@@ -16,15 +16,23 @@ class PantherService
 
     public function saveWebElements(Url $url): void
     {
-        $this->client = Client::createChromeClient();
+        $this->client = Client::createChromeClient(null, null, [
+            'chromedriver_arguments' => [
+                '--whitelisted-ips=',
+                '--headless',
+                '--disable-gpu',
+                'window-size=1024,768',
+                '--no-sandbox'
+            ]
+        ]);
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-        echo $this->client->ping() . PHP_EOL;
-        usleep(300000);
-        var_dump($this->client->getCrawler()
+
+
+        $this->elements = $this->client->getCrawler()
             ->filter(Selectors::FOR_TABLE)
             ->filter(Selectors::FOR_TABLE_BODY)
-            ->children()->getIterator()->getArrayCopy());
+            ->children()->getIterator()->getArrayCopy();
     }
 
     public function findOneElementOn(Url $url): string
