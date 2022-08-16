@@ -24,6 +24,7 @@ class PantherService
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
+        sleep(2);
         try {
             $this->elements = $this->client->getCrawler()
                 ->filter(Selectors::FOR_TABLE)
