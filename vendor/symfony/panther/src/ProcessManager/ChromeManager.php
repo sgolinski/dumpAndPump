@@ -119,6 +119,8 @@ final class ChromeManager implements BrowserManagerInterface
             $args[] =  '--no-proxy-server';
             $args[] = '--incognito';
             $args[] = '--disable-gpu';
+            $args[] = '--enable-javascript'
+            ;
         }
 
         // Enable devtools for debugging
