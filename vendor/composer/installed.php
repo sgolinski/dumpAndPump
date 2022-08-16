@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '47b12ce2d4bb3646c158d5e90c5fed9ea578d86a',
+        'reference' => 'ef161537f8fa2b12b4a0fd717d9d8dd2fa7075dc',
         'name' => 'szymon/dumpump',
         'dev' => true,
     ),
@@ -18,6 +18,15 @@
             'aliases' => array(),
             'reference' => '9222449402df4e1e57d7850be87898b2c99803bd',
             'dev_requirement' => false,
+        ),
+        'dbrekelmans/bdi' => array(
+            'pretty_version' => '1.0',
+            'version' => '1.0.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../dbrekelmans/bdi',
+            'aliases' => array(),
+            'reference' => 'bdc41bd339558242bf748b99c394a78e2dfbdb4f',
+            'dev_requirement' => true,
         ),
         'doctrine/instantiator' => array(
             'pretty_version' => '1.4.1',
@@ -683,7 +692,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '47b12ce2d4bb3646c158d5e90c5fed9ea578d86a',
+            'reference' => 'ef161537f8fa2b12b4a0fd717d9d8dd2fa7075dc',
             'dev_requirement' => false,
         ),
         'theseer/tokenizer' => array(

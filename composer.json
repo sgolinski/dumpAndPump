@@ -1,7 +1,8 @@
 {
     "name": "szymon/dumpump",
     "require-dev": {
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "dbrekelmans/bdi": "^1.0"
 
     },
     "autoload": {
