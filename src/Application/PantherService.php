@@ -22,7 +22,11 @@ class PantherService
                 '--headless',
                 '--disable-gpu',
                 'window-size=1024,768',
-                '--no-sandbox'
+                '--no-sandbox',
+                '--accept-resource-provider',
+                '--allow-insecure-localhost',
+                '--ignore-certificate-errors-spki-lis',
+                '--no-proxy-server'
             ]
         ]);
         $this->ensureIsNotBusy($url);
