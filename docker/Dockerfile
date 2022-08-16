@@ -13,6 +13,10 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
 
 COPY /opcache.ini /usr/local/etc/php/conf.d/
 
+ADD certificate.crt /usr/local/share/ca-certificates/certificate.crt
+RUN sudo update-ca-certificates
+
+
 RUN apk add libzip-dev libzip zip libxml2-dev \
     && docker-php-ext-install zip xml opcache
 
