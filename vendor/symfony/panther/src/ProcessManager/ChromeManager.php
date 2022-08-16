@@ -115,6 +115,7 @@ final class ChromeManager implements BrowserManagerInterface
             $args[] = '--whitelisted-ips=';
             $args[] = '--accept-resource-provider';
             $args[] =  '--secure-connect-api-url';
+            $args[] =  '--webview-enable-modern-cookie-same-site';
             $args[] = '--enable-javascript'
             ;
         }
