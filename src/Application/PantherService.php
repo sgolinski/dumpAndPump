@@ -16,10 +16,10 @@ class PantherService
 
     public function saveWebElements(Url $url): void
     {
-        $this->client = Client::createFirefoxClient();
+        $this->client = Client::createChromeClient();
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-
+        echo $this->client->ping().PHP_EOL;
         $this->elements = $this->client->getCrawler()
             ->filter(Selectors::FOR_TABLE)
             ->filter(Selectors::FOR_TABLE_BODY)
