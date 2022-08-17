@@ -3,7 +3,8 @@ FROM php:8.1.9-cli-alpine
 WORKDIR /mnt/app
 
 ENV PANTHER_NO_SANDBOX 1
-ENV PANTHER_CHROME_ARGUMENTS='(--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166"'
+ENV PANTHER_CHROME_ARGUMENTS='--disable-dev-shm-usage'
+
 
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \
