@@ -1,11 +1,8 @@
 version: "3.7"
 
-networks:
-  pump:
-    driver: "bridge"
-
 services:
   php-cli:
+    image: localhost:5000/dump_pump
     build:
       dockerfile: docker/Dockerfile
       context: ./..
@@ -14,9 +11,6 @@ services:
     restart: always
     links:
       - redis
-    networks:
-      - pump
-
   redis:
     image: redis:4.0
     container_name: dump_app
@@ -32,6 +26,4 @@ services:
     volumes:
       - ./redis/data:/data
     ports:
-      - "6381:6379"
-    networks:
-      - pump
+      - "6385:6379"
