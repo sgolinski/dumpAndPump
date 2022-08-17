@@ -24,13 +24,11 @@ class PantherService
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-        sleep(1);
         try {
             $this->elements = $this->client->getCrawler()
                 ->filter(Selectors::FOR_TABLE)
                 ->filter(Selectors::FOR_TABLE_BODY)
                 ->children()->getIterator()->getArrayCopy();
-            $this->client->wait(1);
         } catch (Exception $exception) {
             $this->client->reload();
         }
