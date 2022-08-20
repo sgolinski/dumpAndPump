@@ -2,15 +2,14 @@ version: "3.7"
 
 services:
   php-cli:
-    image: localhost:5000/dump_pump
+    image: 127.0.0.1:5000/dump_pump
     build:
       dockerfile: docker/Dockerfile
       context: ./..
     volumes:
       - ../:/mnt/app
     restart: always
-    links:
-      - redis
+
   redis:
     image: redis:4.0
     container_name: dump_app
@@ -26,4 +25,4 @@ services:
     volumes:
       - ./redis/data:/data
     ports:
-      - "6385:6379"
+      - "6379:6379"
