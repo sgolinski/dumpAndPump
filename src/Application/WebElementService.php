@@ -19,7 +19,7 @@ class WebElementService
         $this->repository = $repository;
     }
 
-    public function transformElementsToTransactions(array $webElements): array
+    public function transformElementsToTransactions(array $webElements): void
     {
         foreach ($webElements as $webElement) {
             try {
@@ -44,7 +44,6 @@ class WebElementService
 
             $currentTransaction->noticeRepetitions($transaction->price, $transaction->exchangeChain);
         }
-        return $this->repository->all();
     }
 
     private function ensureCacheIsNotEmpty(mixed $cache): void

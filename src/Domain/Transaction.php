@@ -28,17 +28,24 @@ class Transaction extends AggregateRoot
     public ExchangeChain $exchangeChain;
     private Holders $holders;
     private int $repetitions;
-    private bool $completed = false;
-    private bool $blacklisted = false;
-    private bool $isSent = false;
-    private bool $isDumpAndPump = false;
-    private bool $isRegistered = false;
+    private bool $completed;
+    private bool $blacklisted;
+    private bool $isSent;
+    private bool $isDumpAndPump;
+    private bool $isRegistered;
+    private array $prices;
 
 
     public function __construct(Id $id)
     {
         $this->id = $id;
         $this->repetitions = 1;
+        $this->completed = false;
+        $this->blacklisted = false;
+        $this->isDumpAndPump = false;
+        $this->isRegistered = false;
+        $this->isSent = false;
+        $this->prices = [];
     }
 
     public static function writeNewFrom(
@@ -89,10 +96,14 @@ class Transaction extends AggregateRoot
         $this->name = $event->name();
         $this->exchangeChain = $event->chain();
         $this->price = $event->price();
+        $this->prices[] = $this->price->asFloat();
     }
 
     public function applyTransactionWasRepeated(TransactionWasRepeated $event): void
     {
+        if (in_array($event->price()->asFloat(), $this->prices)) {
+           return;
+        }
         $this->price = Price::fromFloat($this->price->asFloat() + $event->price()->asFloat());
         $this->repetitions++;
     }
@@ -192,5 +203,30 @@ class Transaction extends AggregateRoot
     public function showRepetitions(): int
     {
         return $this->repetitions;
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->completed;
+    }
+
+    public function isBlacklisted(): bool
+    {
+        return $this->blacklisted;
+    }
+
+    public function isSent(): bool
+    {
+        return $this->isSent;
+    }
+
+    public function isDumpAndPump(): bool
+    {
+        return $this->isDumpAndPump;
+    }
+
+    public function isRegistered(): bool
+    {
+        return $this->isRegistered;
     }
 }

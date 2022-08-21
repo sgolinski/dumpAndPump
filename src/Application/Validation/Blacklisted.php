@@ -1174,8 +1174,7 @@ class Blacklisted
     ];
 
     public const STATUSES = [
-        // sent, blackliste
-        // nie jest blacklisted i nie jest sent
-        'complete', 'notComplete', 'blacklisted','sent'
+        'blacklisted',
+        'sent'
     ];
 }

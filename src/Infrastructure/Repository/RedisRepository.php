@@ -18,7 +18,7 @@ class RedisRepository
     {
         try {
             $this->client = new Client([
-                'host' => 'redis'
+                'host' => '127.0.0.1'
             ]);
         } catch (Exception $exception) {
             echo 'Not connected';
@@ -33,15 +33,26 @@ class RedisRepository
         return $transaction;
     }
 
+    public function byId(string $id): ?string
+    {
+        foreach (Allowed::STATUSES as $key) {
+            if ($this->client->hexists($key, $id)) {
+                return $this->client->hget($key, $id);
+            }
+        }
+        return null;
+    }
+
     public function ensureHasAllowedStatus(Transaction $transaction): bool
     {
         $statuses = [];
         foreach (Allowed::STATUSES as $key) {
             if ($this->client->hexists($key, $transaction->id->asString())) {
+                echo $key . ' ' . $transaction->name->asString() . ' ' . $transaction->id->asString() . PHP_EOL;
                 $statuses[] = $key;
             }
         }
-        if (in_array(Blacklisted::STATUSES, $statuses)) {
+        if (in_array($statuses, Blacklisted::STATUSES)) {
             return false;
         }
         return true;
@@ -53,8 +64,10 @@ class RedisRepository
     ): void
     {
         $this->ensureCorrectKey($key);
-
         $this->client->hset($key, $transaction->id()->asString(), serialize($transaction->recordedEvents()));
+        if ($key !== 'blacklisted') {
+            $this->client->expireat($key, 3600);
+        }
     }
 
     private function ensureCorrectKey($key): void
@@ -74,8 +87,13 @@ class RedisRepository
         $transactions = [];
         $serialized = $this->client->hgetall($key);
 
-        foreach ($serialized as $key => $string) {
-            $transactions[] = Transaction::reconstitute($key, $string);
+        foreach ($serialized as $id => $string) {
+            $allowToComplete = $this->checkIfIsSentOrBlacklisted($id);
+            if (!$allowToComplete) {
+                $this->client->hdel($key, [$id]);
+                continue;
+            }
+            $transactions[] = Transaction::reconstitute($id, $string);
         }
         return $transactions;
     }
@@ -89,4 +107,13 @@ class RedisRepository
     {
         $this->client->save();
     }
+
+    public function checkIfIsSentOrBlacklisted(string $id): bool
+    {
+        $isSent = $this->client->hexists(Blacklisted::STATUSES[0], $id);
+        $isBlacklisted = $this->client->hexists(Blacklisted::STATUSES[1], $id);
+
+        return $isSent == false && $isBlacklisted == false;
+    }
+
 }

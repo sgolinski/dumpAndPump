@@ -9,6 +9,7 @@ use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
+use App\Infrastructure\Repository\RedisRepository;
 use Exception;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
@@ -16,11 +17,25 @@ use InvalidArgumentException;
 
 class TransactionFactory
 {
+    private RedisRepository $repository;
+
+    public function __construct()
+    {
+        $this->repository = new RedisRepository();
+    }
+
     public function createTransaction(RemoteWebElement $webElement): Transaction
     {
         try {
+
+            $id = $this->createIdFrom($webElement);
+            $events = $this->repository->byId($id->asString());
+            if($events){
+                return Transaction::reconstitute($id->asString(),$events);
+            }
+
             return Transaction::writeNewFrom(
-                $this->createIdFrom($webElement),
+                $id,
                 $this->createNameFrom($webElement),
                 $this->createPriceFrom($webElement),
                 $this->createExchangeChain($webElement)
