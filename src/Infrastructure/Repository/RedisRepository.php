@@ -65,9 +65,6 @@ class RedisRepository
     {
         $this->ensureCorrectKey($key);
         $this->client->hset($key, $transaction->id()->asString(), serialize($transaction->recordedEvents()));
-        if ($key !== 'blacklisted') {
-            $this->client->expireat($key, 3600);
-        }
     }
 
     private function ensureCorrectKey($key): void
