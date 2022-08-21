@@ -23,17 +23,11 @@ class TransactionWasRepeated implements DomainEvent
         return new DateTimeImmutable();
     }
 
-    /**
-     * @return ExchangeChain
-     */
     public function exchangeChain(): ExchangeChain
     {
         return $this->exchangeChain;
     }
 
-    /**
-     * @return Price
-     */
     public function price(): Price
     {
         return $this->price;

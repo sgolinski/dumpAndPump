@@ -35,7 +35,7 @@ class InMemoryRepository implements TransactionRepository
         $repeated = [];
         foreach ($this->transactionsInCache as $transaction) {
             assert($transaction instanceof Transaction);
-            if ($transaction->showRepetitions() >= 5 && $transaction->ensurePriceIsHighEnough() ) {
+            if ($transaction->showRepetitions() >= 2 && $transaction->ensurePriceIsHighEnough() ) {
                 $repeated[] = $transaction;
             }
         }
