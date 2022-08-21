@@ -28,6 +28,7 @@ class TransactionWasRepeated implements DomainEvent
         return $this->exchangeChain;
     }
 
+
     public function price(): Price
     {
         return $this->price;
