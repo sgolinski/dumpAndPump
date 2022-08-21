@@ -42,7 +42,7 @@ class WebElementService
                 continue;
             }
 
-            $currentTransaction->noticeRepetitions();
+            $currentTransaction->noticeRepetitions($transaction->price, $transaction->exchangeChain);
         }
         return $this->repository->all();
     }

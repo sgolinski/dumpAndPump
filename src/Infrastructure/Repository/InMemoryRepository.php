@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Transaction;
+use App\Domain\ValueObjects\Price;
 
 class InMemoryRepository implements TransactionRepository
 {
@@ -33,7 +34,8 @@ class InMemoryRepository implements TransactionRepository
     {
         $repeated = [];
         foreach ($this->transactionsInCache as $transaction) {
-            if ($transaction->showRepetitions() >= 5) {
+            assert($transaction instanceof Transaction);
+            if ($transaction->showRepetitions() >= 5 && $transaction->ensurePriceIsHighEnough() ) {
                 $repeated[] = $transaction;
             }
         }

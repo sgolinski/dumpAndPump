@@ -69,9 +69,9 @@ class Transaction extends AggregateRoot
         return $this->price;
     }
 
-    public function noticeRepetitions(): void
+    public function noticeRepetitions(Price $price, ExchangeChain $chain): void
     {
-        $this->recordAndApply(new TransactionWasRepeated());
+        $this->recordAndApply(new TransactionWasRepeated($price, $chain));
     }
 
     public static function reconstitute(string $id, string $events): self
@@ -91,8 +91,11 @@ class Transaction extends AggregateRoot
         $this->price = $event->price();
     }
 
-    public function applyTransactionWasRepeated(): void
+    public function applyTransactionWasRepeated(TransactionWasRepeated $event): void
     {
+        if ($this->exchangeChain->asString() === $event->exchangeChain()->asString()) {
+            $this->price = Price::fromFloat($this->price->asFloat() + $event->price()->asFloat());
+        }
         $this->repetitions++;
     }
 

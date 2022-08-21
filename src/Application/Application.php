@@ -128,7 +128,10 @@ class Application
         $this->transactionRepository->removeFrom($command->notComplete(), $transaction);
     }
 
-    private function putTransactionOnComplete(Transaction $transaction, FillNotCompleteTransaction $command): void
+    private function putTransactionOnComplete(
+        Transaction $transaction,
+        FillNotCompleteTransaction $command
+    ): void
     {
         $transaction->completeTransaction();
         $this->transactionRepository->save($command->complete(), $transaction);
