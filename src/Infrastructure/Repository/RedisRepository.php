@@ -85,4 +85,8 @@ class RedisRepository
         $this->client->hdel($key, [$transaction->id()->asString()]);
     }
 
+    public function saveDb(): void
+    {
+        $this->client->save();
+    }
 }

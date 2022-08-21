@@ -93,7 +93,6 @@ class Transaction extends AggregateRoot
 
     public function applyTransactionWasRepeated(TransactionWasRepeated $event): void
     {
-        $this->exchangeChain = $event->exchangeChain();
         $this->price = Price::fromFloat($this->price->asFloat() + $event->price()->asFloat());
         $this->repetitions++;
     }

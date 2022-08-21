@@ -18,11 +18,13 @@ class ApplicationProcess
             $this->application->noteRepeatedTransactions();
             $this->application->findBiggestTransactionDrops();
         }
+        $this->application->transactionRepository->saveDb();
     }
 
     public function processEvents(): void
     {
         $this->application->completeTransaction();
         $this->application->sendNotifications();
+        $this->application->transactionRepository->saveDb();
     }
 }
