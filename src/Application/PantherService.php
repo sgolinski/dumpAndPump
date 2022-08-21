@@ -52,6 +52,7 @@ class PantherService
     {
         usleep(30000);
         $this->client->start();
+        $this->client->manage()->window()->maximize();
         usleep(30000);
         $this->client->get($url->asString());
         usleep(30000);
