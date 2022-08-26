@@ -4,7 +4,6 @@ namespace App\Application;
 
 use App\Application\Validation\Selectors;
 use App\Domain\ValueObjects\Url;
-use App\Infrastructure\Repository\InMemoryRepository;
 use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Panther\Client;
@@ -17,7 +16,7 @@ class PantherService
 
     public function __construct()
     {
-        $this->client = Client::createFirefoxClient();
+        $this->client = Client::createChromeClient();
     }
 
     public function saveWebElements(Url $url): void
@@ -50,19 +49,16 @@ class PantherService
 
     private function refreshClient(Url $url): void
     {
-        usleep(30000);
+
         $this->client->start();
-        usleep(30000);
         $this->client->get($url->asString());
-        usleep(30000);
         $this->client->refreshCrawler();
-        usleep(30000);
+
     }
 
     private function ensureIsNotBusy(Url $url): void
     {
         if ($url->asString() === 'https://bscscan.com/busy') {
-            sleep(12);
             $this->client->reload();
         }
     }
