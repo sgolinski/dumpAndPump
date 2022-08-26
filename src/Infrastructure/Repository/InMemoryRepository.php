@@ -3,7 +3,6 @@
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Transaction;
-use App\Domain\ValueObjects\Price;
 
 class InMemoryRepository implements TransactionRepository
 {
