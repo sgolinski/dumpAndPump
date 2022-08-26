@@ -140,10 +140,10 @@ final class ChromeManager implements BrowserManagerInterface
             'host' => '127.0.0.1',
             'port' => $this->get_unused_tcp_port(),
             'path' => '/status',
-            'chromedriver_arguments' => [],
             'capabilities' => [],
         ];
     }
+
     private function get_unused_tcp_port()
     {
         $address = '127.0.0.1';

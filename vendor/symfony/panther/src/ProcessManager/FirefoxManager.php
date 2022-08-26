@@ -110,7 +110,6 @@ final class FirefoxManager implements BrowserManagerInterface
 
         return $args;
     }
-
     private function getDefaultOptions(): array
     {
         return [
