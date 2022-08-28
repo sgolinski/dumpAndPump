@@ -83,25 +83,25 @@ class Application
 
     public function completeTransaction(): void
     {
-        $this->fillAllNotCompletedTransactions(new FillNotCompleteTransaction());
+        $this->completeListedTransactions(new FillNotCompleteTransaction());
     }
 
-    private function fillAllNotCompletedTransactions(FillNotCompleteTransaction $command): void
+    private function completeListedTransactions(FillNotCompleteTransaction $command): void
     {
-        $notCompleteTransactions = $this->transactionRepository->findAll($command->notComplete());
+        $listedTransactions = $this->transactionRepository->findAll($command->listed());
 
-        foreach ($notCompleteTransactions as $notCompletedTransaction) {
-            assert($notCompletedTransaction instanceof Transaction);
+        foreach ($listedTransactions as $listedTransaction) {
+            assert($listedTransaction instanceof Transaction);
 
-            $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $notCompletedTransaction->id()->asString());
+            $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $listedTransaction->id()->asString());
             $elementFrom = $this->pantherService->findOneElementOn($currentURl);
             $holdersAmount = Holders::fromString($elementFrom);
 
             if ($holdersAmount->enoughToTrust()) {
-                $this->putTransactionOnComplete($notCompletedTransaction, $command);
+                $this->putTransactionOnComplete($listedTransaction, $command);
                 continue;
             }
-            $this->putTransactionOnBlacklist($notCompletedTransaction, $holdersAmount, $command);
+            $this->putTransactionOnBlacklist($listedTransaction, $holdersAmount, $command);
         }
     }
 
@@ -139,6 +139,36 @@ class Application
             $this->transactionRepository->save($command->sent(), $completeTransaction);
             $this->transactionRepository->removeFrom($command->complete(), $completeTransaction);
             $completeTransaction->sendNotification();
+        }
+    }
+
+    public function filterNotListed(): void
+    {
+        $this->filterAllNotCompletedTransactions(new FindListedTransaction());
+    }
+
+    private function filterAllNotCompletedTransactions(FindListedTransaction $command): void
+    {
+        $notCompleteTransactions = $this->transactionRepository->findAll($command->notComplete());
+
+        foreach ($notCompleteTransactions as $notCompletedTransaction) {
+            assert($notCompletedTransaction instanceof Transaction);
+
+            $currentURl = Url::fromString(Urls::FOR_LISTED . $notCompletedTransaction->id()->asString());
+            $status = $this->pantherService->findAttributeElementOn($currentURl);
+
+            switch ($status) {
+
+                case 'show':
+                    $notCompletedTransaction->putTransactionOnListed($notCompletedTransaction);
+                    $this->transactionRepository->save($command->listed(), $notCompletedTransaction);
+                    break;
+                case 'not_found':
+                    $notCompletedTransaction->putTransactionOnNotListed($notCompletedTransaction);
+                    $this->transactionRepository->save($command->notListed(), $notCompletedTransaction);
+                    break;
+            }
+            $this->transactionRepository->removeFrom($command->notComplete(), $notCompletedTransaction);
         }
     }
 }

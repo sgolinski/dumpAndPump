@@ -1175,6 +1175,7 @@ class Blacklisted
 
     public const STATUSES = [
         'blacklisted',
-        'sent'
+        'sent',
+        'notListed'
     ];
 }

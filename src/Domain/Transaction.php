@@ -7,6 +7,8 @@ use App\Domain\Event\HoldersWereAssigned;
 use App\Domain\Event\PotentialDumpAndPumpRecognized;
 use App\Domain\Event\TransactionBlacklisted;
 use App\Domain\Event\TransactionCompleted;
+use App\Domain\Event\TransactionIsListed;
+use App\Domain\Event\TransactionIsNotListed;
 use App\Domain\Event\TransactionWasCached;
 use App\Domain\Event\TransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
@@ -33,6 +35,7 @@ class Transaction extends AggregateRoot
     private bool $isSent;
     private bool $isDumpAndPump;
     private bool $isRegistered;
+    private bool $isListed;
     private array $prices;
 
 
@@ -45,6 +48,7 @@ class Transaction extends AggregateRoot
         $this->isDumpAndPump = false;
         $this->isRegistered = false;
         $this->isSent = false;
+        $this->isListed = false;
         $this->prices = [];
     }
 
@@ -102,7 +106,7 @@ class Transaction extends AggregateRoot
     public function applyTransactionWasRepeated(TransactionWasRepeated $event): void
     {
         if (in_array($event->price()->asFloat(), $this->prices)) {
-           return;
+            return;
         }
         $this->price = Price::fromFloat($this->price->asFloat() + $event->price()->asFloat());
         $this->repetitions++;
@@ -228,5 +232,25 @@ class Transaction extends AggregateRoot
     public function isRegistered(): bool
     {
         return $this->isRegistered;
+    }
+
+    public function putTransactionOnListed(Transaction $notCompletedTransaction)
+    {
+        $this->recordAndApply(new TransactionIsListed());
+    }
+
+    public function putTransactionOnNotListed(Transaction $notCompletedTransaction)
+    {
+        $this->recordAndApply(new TransactionIsNotListed());
+    }
+
+    public function applyTransactionIsListed(TransactionIsListed $event)
+    {
+        $this->isListed = true;
+    }
+
+    public function applyTransactionIsNotListed(TransactionIsNotListed $event)
+    {
+        $this->isListed = false;
     }
 }

@@ -16,7 +16,7 @@ class PantherService
 
     public function __construct()
     {
-        $this->client = Client::createChromeClient();
+        $this->client = Client::createFirefoxClient();
     }
 
     public function saveWebElements(Url $url): void
@@ -45,6 +45,25 @@ class PantherService
             $this->client->reload();
             throw  new InvalidArgumentException('Holders unreachable for address ' . $url->asString());
         }
+    }
+
+    public function findAttributeElementOn(Url $url): ?string
+    {
+        $status = null;
+        try {
+            $this->refreshClient($url);
+            usleep(3000);
+            $status = $this->client
+                ->getCrawler()
+                ->filter('body')
+                ->getAttribute('data-action-name');
+
+        } catch (Exception $exception) {
+            $this->client->reload();
+            throw  new InvalidArgumentException('Holders unreachable for address ' . $url->asString());
+        }
+        return $status;
+
     }
 
     private function refreshClient(Url $url): void

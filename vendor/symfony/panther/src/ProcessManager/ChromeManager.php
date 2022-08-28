@@ -127,7 +127,7 @@ final class ChromeManager implements BrowserManagerInterface
     {
         $command = array_merge(
             [$chromeDriverBinary, '--port='.$this->options['port']],
-            $this->options['chromedriver_arguments']
+            $this->options['chromedriver_arguments'] ?? []
         );
 
         return new Process($command, null, null, null, null);

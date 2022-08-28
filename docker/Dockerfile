@@ -1,4 +1,4 @@
-FROM php:8.1.2-cli-alpine3.14
+FROM php:8.1.9-cli-alpine
 
 WORKDIR /mnt/app
 
@@ -12,7 +12,7 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
 
 COPY /opcache.ini /usr/local/etc/php/conf.d/
 
-RUN apk add libzip-dev libzip zip libxml2-dev \
+RUN apk add libzip-dev firefox libzip zip libxml2-dev \
     && docker-php-ext-install zip xml opcache
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
@@ -20,7 +20,12 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 RUN chmod +x /usr/local/bin/install-php-extensions && \
     install-php-extensions sockets gd
 
+
 RUN apk add --no-cache chromium chromium-chromedriver
+ARG GECKODRIVER_VERSION=0.31.0
+RUN wget -q https://github.com/mozilla/geckodriver/releases/download/v$GECKODRIVER_VERSION/geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz; \
+    tar -zxf geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz -C /usr/bin; \
+    rm geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"\
    && php composer-setup.php --install-dir=$(pwd) --filename=composer\

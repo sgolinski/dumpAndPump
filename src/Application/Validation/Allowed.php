@@ -29,5 +29,7 @@ class Allowed
         'notComplete',
         'blacklisted',
         'sent',
+        'listed',
+        'notListed'
     ];
 }

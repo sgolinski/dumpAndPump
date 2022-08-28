@@ -7,6 +7,8 @@ class FillNotCompleteTransaction
     private string $notComplete = 'notComplete';
     private string $blacklist = 'blacklisted';
     private string $complete = 'complete';
+    private string $listed = 'listed';
+
 
     public function notComplete(): string
     {
@@ -21,5 +23,10 @@ class FillNotCompleteTransaction
     public function complete(): string
     {
         return $this->complete;
+    }
+
+    public function listed(): string
+    {
+        return $this->listed;
     }
 }
