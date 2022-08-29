@@ -5,7 +5,7 @@ namespace App\Domain\ValueObjects;
 class Holders
 {
     public int $holders = 0;
-    public const MIN_AMOUNT_HOLDERS = 1000;
+    public const MIN_AMOUNT_HOLDERS = 300;
 
     private function __construct(
         string $holders

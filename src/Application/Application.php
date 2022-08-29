@@ -168,7 +168,7 @@ class Application
                     $this->transactionRepository->save($command->notListed(), $notCompletedTransaction);
                     break;
             }
-            $this->transactionRepository->removeFrom($command->notComplete(), $notCompletedTransaction);
+            $this->transactionRepository->removeFrom($command->notComplete()git , $notCompletedTransaction);
         }
     }
 }
