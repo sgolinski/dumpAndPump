@@ -66,6 +66,24 @@ class PantherService
 
     }
 
+    public function callSmellTest($url): ?int
+    {
+        $status = null;
+        try {
+            $this->refreshClient($url);
+            usleep(3000);
+            $status = $this->client
+                ->getCrawler()
+                ->filter('body')
+                ->getAttribute('data-action-name');
+
+        } catch (Exception $exception) {
+            $this->client->reload();
+            throw  new InvalidArgumentException('Holders unreachable for address ' . $url->asString());
+        }
+        return $status;
+    }
+
     private function refreshClient(Url $url): void
     {
 

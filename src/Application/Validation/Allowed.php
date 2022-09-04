@@ -10,18 +10,18 @@ class Allowed
 
     public const PRICE_PER_NAME =
         [
-            'wbnb' => 7.00,
-            'cake' => 760.00,
-            'bnb' => 7.00,
-            'usdc' => 2470.00,
-            'busd' => 2470.00,
-            'usdt' => 2470.00,
-            'fusdt' => 2470.00,
-            'usdp' => 2470.00,
-            'bsc-usd' => 2470.00,
-            'bscusd' => 2470.00,
-            'btcb' => 0.1,
-            'eth' => 1.3
+            'wbnb' => 16.00,
+            'cake' => 1520.00,
+            'bnb' => 16.00,
+            'usdc' => 4900.00,
+            'busd' => 4900.00,
+            'usdt' => 4900.00,
+            'fusdt' => 4900.00,
+            'usdp' => 4900.00,
+            'bsc-usd' => 4900.00,
+            'bscusd' => 4900.00,
+            'btcb' => 0.3,
+            'eth' => 3.0
         ];
 
     public const STATUSES = [

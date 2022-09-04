@@ -17,10 +17,6 @@ services:
       - 'redis-server'
       - '--loglevel ${REDIS_LOGLEVEL:-warning}'
       - '--databases 2'
-      - '--save 900 1'
-      - '--save 300 10'
-      - '--save 60 10000'
-      - '--maxmemory ${REDIS_MAXMEM:-50mb}'
     volumes:
       - ./redis/data:/data
     ports:
