@@ -2,10 +2,10 @@
 
 use App\Application\ApplicationProcess;
 
-require_once '/mnt/app/vendor/autoload.php';
+require_once './vendor/autoload.php';
 
 
 $process = new ApplicationProcess();
-$process->invoke(1,25);
+$process->invoke(1,48);
 
 

@@ -2,15 +2,13 @@
 
 namespace App\Domain\ValueObjects;
 
-use App\Application\Validation\Allowed;
-
 class ExchangeChain
 {
     private string $exchangeChain;
 
     private function __construct(string $chain)
     {
-        $this->ensureIsAllowedChain($chain);
+
         $this->exchangeChain = $chain;
     }
 
@@ -24,10 +22,5 @@ class ExchangeChain
         return $this->exchangeChain;
     }
 
-    private function ensureIsAllowedChain(string $chain): void
-    {
-        if (!in_array(strtolower($chain), Allowed::NAMES)) {
-            throw new \InvalidArgumentException('Not Allowed Name for Chain');
-        }
-    }
+
 }

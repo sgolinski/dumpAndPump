@@ -13,19 +13,19 @@ class ApplicationProcess
 
     public function invoke(int $start, int $end): void
     {
-        for ($i = $start; $i < $end; $i++) {
+        for ($i = 0; $i < ($end * 2); $i += 2) {
             $this->application->importAllTransactionsFromWebsite($i);
-            $this->application->noteRepeatedTransactions();
-            $this->application->findBiggestTransactionDrops();
+//            $this->application->noteRepeatedTransactions();
+//            $this->application->findBiggestTransactionDrops();
         }
-        $this->application->transactionRepository->saveDb();
+
     }
 
     public function processEvents(): void
     {
-        $this->application->filterNotListed();
-        $this->application->completeTransaction();
-        $this->application->sendNotifications();
+//        $this->application->filterNotListed();
+//        $this->application->completeTransaction();
+//        $this->application->sendNotifications();
         $this->application->transactionRepository->saveDb();
     }
 }

@@ -1178,4 +1178,6 @@ class Blacklisted
         'sent',
         'notListed'
     ];
+
+    public const TXN_TOKENS_NAMES = ['PancakeSwap', 'busd', 'bnb', 'cake'];
 }

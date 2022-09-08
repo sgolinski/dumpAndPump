@@ -26,6 +26,7 @@ class TransactionFactory
 
     public function createTransaction(RemoteWebElement $webElement): Transaction
     {
+        die;
         try {
 
             $id = $this->createIdFrom($webElement);
@@ -36,7 +37,6 @@ class TransactionFactory
 
             return Transaction::writeNewFrom(
                 $id,
-                $this->createNameFrom($webElement),
                 $this->createPriceFrom($webElement),
                 $this->createExchangeChain($webElement)
             );

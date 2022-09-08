@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Transaction;
+use App\Domain\TransactionInterface;
 
 class InMemoryRepository implements TransactionRepository
 {
@@ -36,7 +37,7 @@ class InMemoryRepository implements TransactionRepository
             assert($transaction instanceof Transaction);
             if ($transaction->showRepetitions() >= 2 && $transaction->ensurePriceIsHighEnough()) {
                 $repeated[] = $transaction;
-            }elseif ($transaction->showRepetitions() >= 5){
+            } elseif ($transaction->showRepetitions() >= 5) {
                 $repeated[] = $transaction;
             }
         }
@@ -65,7 +66,7 @@ class InMemoryRepository implements TransactionRepository
         // TODO: Implement save() method.
     }
 
-    public function add(string $key, Transaction $transaction)
+    public function add(string $key, TransactionInterface $transaction)
     {
         $this->transactionsInCache[$key] = $transaction;
     }
@@ -74,4 +75,5 @@ class InMemoryRepository implements TransactionRepository
     {
         unset($this->transactionsInCache[$key]);
     }
+
 }

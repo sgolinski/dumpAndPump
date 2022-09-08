@@ -8,6 +8,6 @@ stop:
 	docker compose -p dump_pump -f docker/docker-compose.yaml down --remove-orphans
 
 composer_install:
-	docker compose -p dump_pump -f docker/docker-compose.yaml run php-cli composer update
+	docker cacompose -p dump_pump -f docker/docker-compose.yaml run php-cli composer update
 
 install: build composer_install

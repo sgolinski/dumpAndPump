@@ -2,12 +2,9 @@
 
 namespace App\Application;
 
-use App\Application\Validation\Selectors;
+use App\Application\Validation\RouterSelectors;
 use App\Domain\ValueObjects\Url;
-use Exception;
-use InvalidArgumentException;
 use Symfony\Component\Panther\Client;
-
 
 class PantherService
 {
@@ -23,70 +20,16 @@ class PantherService
     {
         $this->ensureIsNotBusy($url);
         $this->refreshClient($url);
-        try {
-            $this->elements = $this->client->getCrawler()
-                ->filter(Selectors::FOR_TABLE)
-                ->filter(Selectors::FOR_TABLE_BODY)
-                ->children()->getIterator()->getArrayCopy();
-        } catch (Exception $exception) {
-            $this->client->reload();
-        }
-    }
 
-    public function findOneElementOn(Url $url): string
-    {
-        try {
-            $this->refreshClient($url);
-            return $this->client->getCrawler()
-                ->filter(Selectors::FOR_HOLDERS)
-                ->getText();
-
-        } catch (Exception $exception) {
-            $this->client->reload();
-            throw  new InvalidArgumentException('Holders unreachable for address ' . $url->asString());
-        }
-    }
-
-    public function findAttributeElementOn(Url $url): ?string
-    {
-        $status = null;
-        try {
-            $this->refreshClient($url);
-            usleep(3000);
-            $status = $this->client
-                ->getCrawler()
-                ->filter('body')
-                ->getAttribute('data-action-name');
-
-        } catch (Exception $exception) {
-            $this->client->reload();
-            throw  new InvalidArgumentException('Holders unreachable for address ' . $url->asString());
-        }
-        return $status;
-
-    }
-
-    public function callSmellTest($url): ?int
-    {
-        $status = null;
-        try {
-            $this->refreshClient($url);
-            usleep(3000);
-            $status = $this->client
-                ->getCrawler()
-                ->filter('body')
-                ->getAttribute('data-action-name');
-
-        } catch (Exception $exception) {
-            $this->client->reload();
-            throw  new InvalidArgumentException('Holders unreachable for address ' . $url->asString());
-        }
-        return $status;
+        $this->elements = $this->client->getCrawler()
+            ->filter(RouterSelectors::FOR_CONTENT_TABLE)
+            ->children()
+            ->getIterator()
+            ->getArrayCopy();
     }
 
     private function refreshClient(Url $url): void
     {
-
         $this->client->start();
         $this->client->get($url->asString());
         $this->client->refreshCrawler();
@@ -109,5 +52,4 @@ class PantherService
     {
         return $this->elements;
     }
-
 }

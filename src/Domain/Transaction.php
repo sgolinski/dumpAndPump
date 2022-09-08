@@ -9,7 +9,7 @@ use App\Domain\Event\TransactionBlacklisted;
 use App\Domain\Event\TransactionCompleted;
 use App\Domain\Event\TransactionIsListed;
 use App\Domain\Event\TransactionIsNotListed;
-use App\Domain\Event\TransactionWasCached;
+use App\Domain\Event\SaleTransactionWasCached;
 use App\Domain\Event\TransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
 use App\Domain\Event\TransactionWasSent;
@@ -54,16 +54,14 @@ class Transaction extends AggregateRoot
 
     public static function writeNewFrom(
         Id            $id,
-        Name          $name,
         Price         $price,
         ExchangeChain $chain
     ): self
     {
         $transaction = new self($id);
 
-        $transaction->recordAndApply(new TransactionWasCached(
+        $transaction->recordAndApply(new SaleTransactionWasCached(
             $id,
-            $name,
             $chain,
             $price
         ));
@@ -95,9 +93,8 @@ class Transaction extends AggregateRoot
         return $transaction;
     }
 
-    public function applyTransactionWasCached(TransactionWasCached $event): void
+    public function applyTransactionWasCached(SaleTransactionWasCached $event): void
     {
-        $this->name = $event->name();
         $this->exchangeChain = $event->chain();
         $this->price = $event->price();
         $this->prices[] = $this->price->asFloat();
