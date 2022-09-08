@@ -60,4 +60,8 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
     {
         return $this->id;
     }
+
+    public function registerTransaction()
+    {
+    }
 }
