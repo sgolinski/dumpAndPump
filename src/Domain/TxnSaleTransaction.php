@@ -61,7 +61,24 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         return $this->id;
     }
 
-    public function registerTransaction()
+    public function registerTransaction(): void
     {
+        $this->recordAndApply(new TransactionWasRegistered(
+                $this->id,
+                $this->name,
+                $this->exchangeChain,
+                $this->price
+            )
+        );
     }
+
+    public function applyTransactionWasRegistered(TransactionWasRegistered $event): void
+    {
+        $this->name = $event->name();
+        $this->price = $event->price();
+        $this->exchangeChain = $event->exchangeChain();
+        $this->isRegistered = true;
+    }
+
+
 }
