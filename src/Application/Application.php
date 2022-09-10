@@ -2,7 +2,9 @@
 
 namespace App\Application;
 
+use App\Application\Validation\Urls;
 use App\Domain\TxnSaleTransaction;
+use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
 use App\Infrastructure\Repository\InMemorySaleTransactionRepository;
 use App\Infrastructure\Repository\RedisRepository;
@@ -91,7 +93,7 @@ class Application
         $listedTransactions = $this->transactionRepository->findAll($command->listed());
 
         foreach ($listedTransactions as $listedTransaction) {
-            assert($listedTransaction instanceof Transaction);
+            assert($listedTransaction instanceof TxnSaleTransaction);
 
             $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $listedTransaction->id()->asString());
             $elementFrom = $this->pantherService->findOneElementOn($currentURl);

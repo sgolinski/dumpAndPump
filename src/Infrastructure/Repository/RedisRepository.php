@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repository;
 use App\Application\Validation\Allowed;
 use App\Application\Validation\Blacklisted;
 use App\Domain\Transaction;
+use App\Domain\TransactionInterface;
 use App\Domain\ValueObjects\Id;
 use Exception;
 use InvalidArgumentException;
@@ -60,7 +61,7 @@ class RedisRepository
 
     public function save(
         string      $key,
-        Transaction $transaction
+        TransactionInterface $transaction
     ): void
     {
         $this->ensureCorrectKey($key);
