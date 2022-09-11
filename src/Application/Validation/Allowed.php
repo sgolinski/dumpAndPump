@@ -60,7 +60,7 @@ class Allowed
         '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82'];
 
     public const EXCHANGE_CHAINS = [
-        'busd', 'bsc-usd', 'wbnb', 'cake-l', 'usdc', 'bnb', 'ustc', 'cake', 'bsc-us'
+        'busd', 'bsc-usd', 'wbnb', 'cake-l', 'usdc', 'bnb', 'cake', 'bsc-us'
     ];
 
     public const ROUTER_NAMES = [

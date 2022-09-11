@@ -54,13 +54,14 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         $this->address = $event->address();
         $this->price = $event->price();
         $this->highPrice = $event->highPrice();
-
+        $this->type = $event->type();
     }
 
     public function id(): TxnHashId
     {
         return $this->txnHashId;
     }
+
     public function txnHashId(): TxnHashId
     {
         return $this->txnHashId;

@@ -54,21 +54,22 @@ class Application
         $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
     }
 
-    public function noteRepeatedSaleTransactions(): void
-    {
-        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
-    }
-
-    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
-    {
-        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
-
-        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
-            assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
-            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
-            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
-        }
-    }
+//
+//    public function noteRepeatedTransactions(): void
+//    {
+//        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
+//    }
+//
+//    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
+//    {
+//        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
+//
+//        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
+//            assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
+//            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
+//            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
+//        }
+//    }
 
     public function findBiggestTransactionDrops(): void
     {
@@ -81,20 +82,33 @@ class Application
         $currentPrice = 0.0;
         foreach ($transactions as $transactionArr) {
 
+            $exchangeName = null;
+            $exchangePrice = null;
+            $txnHash = null;
+            $currentPrice = null;
+            $id = null;
+            $name = null;
+
             foreach ($transactionArr as $transaction) {
-                assert($transaction instanceof TransactionInterface);
-                if ($transaction->type() == 'exchange' && $transaction > $currentPrice) {
+
+                if ($transaction == null) {
+                    continue;
+                }
+                if ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
                     $exchangeName = $transaction->name();
                     $exchangePrice = $transaction->price();
-                    $txnHash = $transaction->id();
-                    $currentPrice = $transaction->price()->asFloat();
-                } else {
+                    $txnHash = $transaction->txnHashId();
+                    $currentPrice = $transaction->price();
+                }
+
+                if ($transaction->type()->asString() == 'other') {
                     $id = $transaction->id();
                     $name = $transaction->name();
                 }
             }
 
             $transaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
+            var_dump($transaction);
             $this->transactionRepository->save($command->notComplete(), $transaction);
         }
 
@@ -190,4 +204,5 @@ class Application
             $this->transactionRepository->removeFrom($command->notComplete(), $notCompletedTransaction);
         }
     }
+
 }

@@ -58,4 +58,9 @@ class SaleTransactionWasCached implements DomainEvent
         return $this->highPrice;
     }
 
+    public function type(): Type
+    {
+        return $this->type;
+    }
+
 }

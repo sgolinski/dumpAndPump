@@ -30,6 +30,7 @@ class TransactionWasCached implements DomainEvent
         $this->name = $name;
         $this->price = $price;
         $this->exchangeName = $exchangeName;
+        $this->txnHashId = $txnHashId;
     }
 
     public function id(): Id

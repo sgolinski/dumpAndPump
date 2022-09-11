@@ -56,6 +56,7 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
         $this->txnHashId = $event->txnHashId();
         $this->fromAddress = $event->fromAddress();
         $this->price = $event->price();
+        $this->type = $event->type();
     }
 
     public function id(): Id
@@ -68,9 +69,6 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
         $this->recordAndApply(new PotentialDumpAndPumpRecognized());
     }
 
-    /**
-     * @return TxnHashId
-     */
     public function txnHashId(): TxnHashId
     {
         return $this->txnHashId;

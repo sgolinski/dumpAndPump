@@ -52,17 +52,17 @@ class WebElementService
             $isPancakeTransaction = $this->checkIfIsPancakeTransaction($router);
 
             if ($isPancakeTransaction && $isSaleTransaction) {
-                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price);
+                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price, $type);
 
             } elseif (!$isPancakeTransaction && $isSaleTransaction) {
-                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price);
+                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price, $type);
 
 
             } elseif ($isPancakeTransaction && !$isSaleTransaction) {
-                $transaction = $this->factory->createBuyTransaction($webElement);
+                $transaction = $this->factory->createBuyTransaction($webElement, $type);
 
             } else {
-                $transaction = $this->factory->createBuyTransaction($webElement);
+                $transaction = $this->factory->createBuyTransaction($webElement, $type);
             }
 
             if ($transaction == null) {

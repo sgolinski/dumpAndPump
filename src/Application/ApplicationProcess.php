@@ -15,8 +15,8 @@ class ApplicationProcess
     {
         for ($i = 0; $i < ($end * 2); $i += 2) {
             $this->application->importAllTransactionsFromWebsite($i);
-            $this->application->noteRepeatedTransactions();
-//            $this->application->findBiggestTransactionDrops();
+            //$this->application->noteRepeatedTransactions();
+            $this->application->findBiggestTransactionDrops();
         }
 
     }

@@ -58,4 +58,9 @@ class BuyTransactionWasCached implements DomainEvent
         return $this->txnHashId;
     }
 
+    public function type(): Type
+    {
+        return $this->type;
+    }
+
 }
