@@ -7,7 +7,12 @@ use App\Domain\TransactionInterface;
 
 class InMemoryRepository implements TransactionRepository
 {
-    private array $transactionsInCache = [];
+    private array $transactionsInCache;
+
+    public function __construct()
+    {
+        $this->transactionsInCache = [];
+    }
 
     public function byId($id): Transaction
     {
@@ -68,7 +73,7 @@ class InMemoryRepository implements TransactionRepository
 
     public function add(string $key, TransactionInterface $transaction)
     {
-        $this->transactionsInCache[$key] = $transaction;
+        $this->transactionsInCache[$key][] = $transaction;
     }
 
     public function remove($key)

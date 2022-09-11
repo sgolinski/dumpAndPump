@@ -4,7 +4,6 @@ namespace App\Domain\Event;
 
 use App\Domain\ValueObjects\Address;
 use App\Domain\ValueObjects\Name;
-use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\DomainEvent;

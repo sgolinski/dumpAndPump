@@ -8,7 +8,7 @@ class Price
 
     private function __construct(float $price)
     {
-        return $this->price = $price;
+      $this->price = $price;
     }
 
     public static function fromFloat(float $price): self

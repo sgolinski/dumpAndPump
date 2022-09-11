@@ -8,7 +8,7 @@ use App\Domain\Event\FindPotentialDumpAndPumpTransaction;
 use App\Domain\TxnSaleTransaction;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
-use App\Infrastructure\Repository\InMemorySaleTransactionRepository;
+
 use App\Infrastructure\Repository\RedisRepository;
 use DateTime;
 use Exception;
@@ -16,8 +16,6 @@ use Exception;
 class Application
 {
     private InMemoryRepository $inMemoryRepository;
-
-    private InMemorySaleTransactionRepository $inMemorySaleTransactionRepository;
 
     private PantherService $pantherService;
 
@@ -31,10 +29,9 @@ class Application
     {
         $this->pantherService = new PantherService();
         $this->inMemoryRepository = new InMemoryRepository();
-        $this->inMemorySaleTransactionRepository = new InMemorySaleTransactionRepository();
         $this->transactionRepository = new RedisRepository();
         $this->notificationService = new NotificationService();
-        $this->service = new WebElementService($this->inMemoryRepository, $this->inMemorySaleTransactionRepository);
+        $this->service = new WebElementService($this->inMemoryRepository);
     }
 
     public function importAllTransactionsFromWebsite(int $number): void
@@ -61,7 +58,7 @@ class Application
 
     private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
     {
-        $potentialDumpAndPumpTransactions = $this->inMemorySaleTransactionRepository->byRepetitions();
+        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
 
         foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
             assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
@@ -77,7 +74,7 @@ class Application
 
     private function filterSaleTransactions(FindBiggestSaleTransaction $command): void
     {
-        $saleTransactions = $this->inMemorySaleTransactionRepository->byPrice();
+        $saleTransactions = $this->inMemoryRepository->byPrice();
         foreach ($saleTransactions as $saleTransaction) {
             assert($saleTransaction instanceof TxnSaleTransaction);
             $saleTransaction->registerTransaction();

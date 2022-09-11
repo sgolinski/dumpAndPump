@@ -1179,5 +1179,7 @@ class Blacklisted
         'notListed'
     ];
 
-    public const TXN_TOKENS_NAMES = ['PancakeSwap', 'busd', 'bnb', 'cake'];
+    public const TXN_TOKENS_NAMES = ['vcake'];
+
+    public const ROUTER_NAMES = ['Venus'];
 }

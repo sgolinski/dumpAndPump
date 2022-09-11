@@ -5,13 +5,14 @@ namespace App\Application\Validation;
 class Allowed
 {
     public const NAMES = [
-        'wbnb', 'cake', 'bnb', 'usdc', 'busd', 'usdt', 'fusdt', 'usdp', 'bsc-usd', 'eth', 'cake', 'btcb'
+        'wbnb', 'cake', 'bnb', 'usdc', 'busd', 'usdt', 'fusdt', 'usdp', 'bsc-usd', 'eth', 'cake', 'btcb','cake-l'
     ];
 
     public const PRICE_PER_NAME =
         [
             'wbnb' => 5.00,
             'cake' => 520.00,
+            'cake-l' => 10.00,
             'bnb' => 5.00,
             'usdc' => 1200.00,
             'busd' => 1200.00,
@@ -40,6 +41,12 @@ class Allowed
         '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82'];
 
     public const EXCHANGE_CHAINS = [
-        'busd', 'bsc-usd', 'wbnb', 'cake-l', 'usdc'
+        'busd', 'bsc-usd', 'wbnb', 'cake-l', 'usdc', 'bnb', 'ustc', 'cake'
     ];
+
+    public const ROUTER_NAMES =[
+        'Pancake LPs', 'PancakeSwap V2',
+    ];
+
+
 }

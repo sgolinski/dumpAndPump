@@ -16,7 +16,7 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     private TxnHashId $txnHashId;
     private Address $fromAddress;
     private Id $id;
-    private Name $chainName;
+    private Name $name;
     private Price $price;
 
 
@@ -48,7 +48,7 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
 
     public function applyBuyTransactionWasCached(BuyTransactionWasCached $event): void
     {
-        $this->chainName = $event->name();
+        $this->name = $event->name();
         $this->txnHashId = $event->txnHashId();
         $this->fromAddress = $event->fromAddress();
         $this->price = $event->price();
@@ -62,5 +62,13 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     public function recognizePumpAndDump(): void
     {
         $this->recordAndApply(new PotentialDumpAndPumpRecognized());
+    }
+
+    /**
+     * @return TxnHashId
+     */
+    public function txnHashId(): TxnHashId
+    {
+        return $this->txnHashId;
     }
 }

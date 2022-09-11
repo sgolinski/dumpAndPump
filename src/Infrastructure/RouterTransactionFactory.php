@@ -13,7 +13,6 @@ use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\Repository\InMemoryRepository;
-use App\Infrastructure\Repository\InMemorySaleTransactionRepository;
 use App\Infrastructure\Repository\RedisRepository;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
@@ -22,13 +21,12 @@ class RouterTransactionFactory
 {
     private RedisRepository $repository;
     private InMemoryRepository $inMemoryRepository;
-    private InMemorySaleTransactionRepository $inMemorySaleTransactionRepository;
 
-    public function __construct()
+
+    public function __construct(InMemoryRepository $inMemoryRepository)
     {
         $this->repository = new RedisRepository();
-        $this->inMemoryRepository = new InMemoryRepository();
-        $this->inMemorySaleTransactionRepository = new InMemorySaleTransactionRepository();
+        $this->inMemoryRepository = $inMemoryRepository;
     }
 
     public function createTxnSaleTransaction(
@@ -39,7 +37,7 @@ class RouterTransactionFactory
         $txnHash = $this->createTxnHash($webElement);
         $txnHashId = TxnHashId::fromString(str_replace('/tx/', '', $txnHash));
 
-        $tokenAddress = $this->createTokenAddress($webElement);
+        $tokenAddress = $this->createToken($webElement);
         $tokenAddress = Address::fromString($tokenAddress);
 
         $price = $this->createPriceFrom($webElement);
@@ -52,7 +50,7 @@ class RouterTransactionFactory
 
         $transaction = TxnSaleTransaction::writeNewFrom($txnHashId, $tokenName, $tokenAddress, $price, $highPrice);
 
-        $this->inMemorySaleTransactionRepository->add($transaction->id()->asString(), $transaction);
+        $this->inMemoryRepository->add($transaction->id()->asString(), $transaction);
 
         return $transaction;
     }
@@ -70,14 +68,14 @@ class RouterTransactionFactory
         $tokenId = $this->createToken($webElement);
         $tokenId = Id::fromString($tokenId);
 
-        $tokenName = $this->createTokenNameForBuyTransaction($webElement);
+        $tokenName = $this->createTokenName($webElement);
         $tokenName = Name::fromString($tokenName);
 
         $price = $this->createPriceFrom($webElement);
         $price = Price::fromFloat((float)$price);
 
         $transaction = BuyTransaction::writeNewFrom($tokenId, $tokenName, $txnHashId, $fromAddress, $price);
-        $this->inMemoryRepository->add($transaction->id()->asString(), $transaction);
+        $this->inMemoryRepository->add($transaction->txnHashId()->asString(), $transaction);
         return $transaction;
     }
 
@@ -135,9 +133,11 @@ class RouterTransactionFactory
 
     private function createPriceFrom(RemoteWebElement $webElement): string
     {
-        return $webElement
+        $price = $webElement
             ->findElement(WebDriverBy::cssSelector(RouterSelectors::PRICE))
             ->getText();
+
+        return str_replace(',', '', $price);
     }
 
     public function createToken(RemoteWebElement $webElement): string
@@ -168,7 +168,7 @@ class RouterTransactionFactory
             ->getAttribute('href');
     }
 
-    public function createTokenName(RemoteWebElement $webElement): Name
+    public function createTokenName(RemoteWebElement $webElement): string
     {
         $information = $webElement
             ->findElement(WebDriverBy::cssSelector(RouterSelectors::TOKEN_TEXT))
@@ -176,10 +176,10 @@ class RouterTransactionFactory
 
         $str = strstr($information, "(");
         $chain = str_replace(['(', ')', '...'], '', $str);
-        $chain = str_replace("BSC-US...", "bsc-usd", $chain);
+        $chain = str_replace(strtolower("BSC-US..."), "bsc-usd", $chain);
 
 
-        return Name::fromString(strtolower($chain));
+        return strtolower($chain);
     }
 
     private function createTokenNameForBuyTransaction(RemoteWebElement $webElement): string

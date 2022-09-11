@@ -8,8 +8,6 @@ use App\Domain\Event\SaleTransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
 use App\Domain\ValueObjects\Address;
 use App\Domain\ValueObjects\Name;
-use App\Domain\ValueObjects\Id;
-use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\AggregateRoot;
@@ -25,7 +23,6 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
 
     public function __construct(
         TxnHashId $id,
-
     )
     {
         $this->txnHashId = $id;
@@ -43,9 +40,9 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         $transaction = new self($id);
 
         $transaction->recordAndApply(new SaleTransactionWasCached(
-            $price,
-            $address,
             $name,
+            $address,
+            $price,
             $highPrice
         ));
         return $transaction;

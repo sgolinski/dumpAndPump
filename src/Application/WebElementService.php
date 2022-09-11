@@ -3,27 +3,21 @@
 namespace App\Application;
 
 use App\Application\Validation\Allowed;
-use App\Domain\Transaction;
 use App\Domain\ValueObjects\Name;
-use App\Infrastructure\Factory;
-use App\Infrastructure\LiquidityTransactionFactory;
 use App\Infrastructure\Repository\InMemoryRepository;
-use App\Infrastructure\Repository\InMemorySaleTransactionRepository;
 use App\Infrastructure\RouterTransactionFactory;
-use App\Infrastructure\TransactionFactory;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 
 class WebElementService
 {
     public RouterTransactionFactory $factory;
     public InMemoryRepository $repository;
-    public InMemorySaleTransactionRepository $saleTransactionRepository;
 
-    public function __construct(InMemoryRepository $repository, InMemorySaleTransactionRepository $saleTransactionRepository)
+    public function __construct(InMemoryRepository $repository)
     {
-        $this->factory = new RouterTransactionFactory();
         $this->repository = $repository;
-        $this->saleTransactionRepository = $saleTransactionRepository;
+        $this->factory = new RouterTransactionFactory($this->repository);
+
     }
 
     public function transformElementsToTransactions(array $webElements): void
@@ -40,39 +34,34 @@ class WebElementService
 
             $isPancakeTransaction = $this->checkIfIsPancakeTransaction($type);
             $isSaleTransaction = $this->checkIfTokenNameIsExchangeTokenName($tokenName);
-
+            $tokenName = Name::fromString($tokenName);
             if ($isPancakeTransaction && $isSaleTransaction) {
                 $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName);
 
-                var_dump($transaction);
-                die;
-                $key = $transaction->id()->asString();
-                if ($this->saleTransactionRepository->isEmpty() || $this->saleTransactionRepository->hasId($key)) {
-                    $this->repository->add($key, $transaction);
-                    continue;
-                }
-
             } elseif (!$isPancakeTransaction && $isSaleTransaction) {
                 $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName);
-                var_dump($transaction);
-                die;
+                // var_dump($transaction);
+
             } elseif ($isPancakeTransaction && !$isSaleTransaction) {
                 $transaction = $this->factory->createBuyTransaction($webElement);
-                var_dump($transaction);
-                die;
+                // var_dump($transaction);
+
             } else {
-                $transaction = null;
+                $transaction = $this->factory->createBuyTransaction($webElement);
             }
 
             if ($transaction == null) {
                 continue;
             }
         }
+
+        var_dump($this->repository->all());
+        die;
     }
 
-    private function checkIfTokenNameIsExchangeTokenName(Name $chain): bool
+    private function checkIfTokenNameIsExchangeTokenName(string $name): bool
     {
-        if (in_array($chain, Allowed::EXCHANGE_CHAINS)) {
+        if (in_array(strtolower($name), Allowed::EXCHANGE_CHAINS)) {
             return true;
         }
         return false;
@@ -80,6 +69,11 @@ class WebElementService
 
     private function checkIfIsPancakeTransaction(string $type): bool
     {
-        return str_contains(strtolower($type), strtolower('PancakeSwap V2:'));
+        foreach (Allowed::ROUTER_NAMES as $router_name) {
+            if (str_contains(strtolower($type), strtolower($router_name))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

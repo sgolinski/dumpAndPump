@@ -95,7 +95,7 @@ class Transaction extends AggregateRoot
 
     public function applyTransactionWasCached(SaleTransactionWasCached $event): void
     {
-        $this->exchangeChain = $event->chain();
+        $this->exchangeChain = $event->address();
         $this->price = $event->price();
         $this->prices[] = $this->price->asFloat();
     }

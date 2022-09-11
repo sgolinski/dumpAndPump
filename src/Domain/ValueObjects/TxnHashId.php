@@ -8,7 +8,7 @@ class TxnHashId
 
     private function __construct(string $txnHash)
     {
-        $this->txnHash = str_replace('/address/', '', $txnHash);
+        $this->txnHash = str_replace(['/address/', '/tx/'], '', $txnHash);
     }
 
     public static function fromString(string $txnHash): self

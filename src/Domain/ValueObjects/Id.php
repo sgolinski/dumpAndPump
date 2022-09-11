@@ -8,7 +8,7 @@ class Id
 
     private function __construct(string $id)
     {
-        $this->id = str_replace('/address/', '', $id);
+        $this->id = str_replace(['/address/', '/tx/'], '', $id);
     }
 
     public static function fromString(string $id): self
