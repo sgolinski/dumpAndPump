@@ -34,7 +34,7 @@ class Application
         $this->inMemorySaleTransactionRepository = new InMemorySaleTransactionRepository();
         $this->transactionRepository = new RedisRepository();
         $this->notificationService = new NotificationService();
-        $this->service = new WebElementService($this->inMemoryRepository);
+        $this->service = new WebElementService($this->inMemoryRepository, $this->inMemorySaleTransactionRepository);
     }
 
     public function importAllTransactionsFromWebsite(int $number): void

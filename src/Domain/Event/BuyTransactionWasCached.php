@@ -3,29 +3,30 @@
 namespace App\Domain\Event;
 
 use App\Domain\ValueObjects\Address;
-use App\Domain\ValueObjects\ExchangeChain;
+use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
+use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\DomainEvent;
 use DateTimeImmutable;
 
 class BuyTransactionWasCached implements DomainEvent
 {
     private Name $name;
-    private Address $txnAddress;
+    private TxnHashId $txnHashId;
     private Price $price;
-    private ExchangeChain $chain;
+    private Address $fromAddress;
 
     public function __construct(
-        Address       $txnAddress,
-        Price         $price,
-        ExchangeChain $chain,
-        Name          $name
+        TxnHashId $txnHashId,
+        Address   $fromAddress,
+        Price     $price,
+        Name      $name
     )
     {
-        $this->txnAddress = $txnAddress;
+        $this->txnHashId = $txnHashId;
+        $this->fromAddress = $fromAddress;
         $this->price = $price;
-        $this->chain = $chain;
         $this->name = $name;
     }
 
@@ -39,9 +40,9 @@ class BuyTransactionWasCached implements DomainEvent
         return $this->name;
     }
 
-    public function chain(): ExchangeChain
+    public function fromAddress(): Address
     {
-        return $this->chain;
+        return $this->fromAddress;
     }
 
     public function price(): Price
@@ -49,9 +50,9 @@ class BuyTransactionWasCached implements DomainEvent
         return $this->price;
     }
 
-    public function txnAddress(): Address
+    public function txnHashId(): TxnHashId
     {
-        return $this->txnAddress;
+        return $this->txnHashId;
     }
 
 }

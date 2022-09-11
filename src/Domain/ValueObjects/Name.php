@@ -2,8 +2,6 @@
 
 namespace App\Domain\ValueObjects;
 
-use App\Application\Validation\Blacklisted;
-use InvalidArgumentException;
 
 class Name
 {

@@ -2,7 +2,7 @@
 
 namespace App\Domain\Event;
 
-use App\Domain\ValueObjects\ExchangeChain;
+use App\Domain\ValueObjects\Address;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Infrastructure\DomainEvent;
@@ -11,26 +11,21 @@ use DateTimeImmutable;
 class SaleTransactionWasCached implements DomainEvent
 {
     private Price $price;
-    private ExchangeChain $chain;
-    private Name $chainName;
+    private Address $address;
+    private Name $name;
     private bool $highPrice;
 
-    /**
-     * @param Price $price
-     * @param ExchangeChain $chain
-     * @param Name $chainName
-     * @param bool $highPrice
-     */
+
     public function __construct(
-        Price         $price,
-        ExchangeChain $chain,
-        Name          $chainName,
-        bool          $highPrice
+        Name    $name,
+        Address $address,
+        Price   $price,
+        bool    $highPrice
     )
     {
         $this->price = $price;
-        $this->chain = $chain;
-        $this->chainName = $chainName;
+        $this->address = $address;
+        $this->name = $name;
         $this->highPrice = $highPrice;
     }
 
@@ -41,12 +36,12 @@ class SaleTransactionWasCached implements DomainEvent
 
     public function chainName(): Name
     {
-        return $this->chainName;
+        return $this->name;
     }
 
-    public function chain(): ExchangeChain
+    public function address(): Address
     {
-        return $this->chain;
+        return $this->address;
     }
 
     public function price(): Price

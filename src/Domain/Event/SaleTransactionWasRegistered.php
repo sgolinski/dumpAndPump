@@ -2,36 +2,36 @@
 
 namespace App\Domain\Event;
 
-use App\Domain\ValueObjects\ExchangeChain;
-use App\Domain\ValueObjects\Id;
+use App\Domain\ValueObjects\Address;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
+use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\DomainEvent;
 use DateTimeImmutable;
 
 class SaleTransactionWasRegistered implements DomainEvent
 {
-    private Id $id;
+    private TxnHashId $txnHashId;
     private Name $name;
-    private ExchangeChain $exchangeChain;
+    private Address $address;
     private Price $price;
 
     public function __construct(
-        Id            $id,
-        Name          $name,
-        ExchangeChain $chain,
-        Price         $price,
+        TxnHashId $id,
+        Name      $name,
+        Address   $address,
+        Price     $price,
     )
     {
-        $this->id = $id;
+        $this->txnHashId = $id;
         $this->name = $name;
-        $this->exchangeChain = $chain;
+        $this->address = $address;
         $this->price = $price;
     }
 
-    public function id(): Id
+    public function txnHashId(): TxnHashId
     {
-        return $this->id;
+        return $this->txnHashId;
     }
 
     public function name(): Name
@@ -39,9 +39,9 @@ class SaleTransactionWasRegistered implements DomainEvent
         return $this->name;
     }
 
-    public function exchangeChain(): ExchangeChain
+    public function address(): Address
     {
-        return $this->exchangeChain;
+        return $this->address;
     }
 
     public function price(): Price

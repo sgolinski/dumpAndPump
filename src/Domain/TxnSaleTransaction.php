@@ -6,44 +6,46 @@ namespace App\Domain;
 use App\Domain\Event\SaleTransactionWasCached;
 use App\Domain\Event\SaleTransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
-use App\Domain\ValueObjects\ExchangeChain;
+use App\Domain\ValueObjects\Address;
+use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
+use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\AggregateRoot;
 
 
 class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
 {
+    private TxnHashId $txnHashId;
     private bool $highPrice;
-    private Name $chainName;
-    private ExchangeChain $chain;
+    private Name $name;
+    private Address $address;
     private Price $price;
-    private Id $id;
 
     public function __construct(
-        Id $id,
+        TxnHashId $id,
 
     )
     {
-        $this->id = $id;
+        $this->txnHashId = $id;
 
     }
 
     public static function writeNewFrom(
-        Id            $id,
-        Name          $chainName,
-        ExchangeChain $chain,
-        Price         $price,
-        bool          $highPrice,
+        TxnHashId $id,
+        Name      $name,
+        Address   $address,
+        Price     $price,
+        bool      $highPrice,
     ): self
     {
         $transaction = new self($id);
 
         $transaction->recordAndApply(new SaleTransactionWasCached(
             $price,
-            $chain,
-            $chainName,
+            $address,
+            $name,
             $highPrice
         ));
         return $transaction;
@@ -51,24 +53,24 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
 
     public function applySaleTransactionWasCached(SaleTransactionWasCached $event): void
     {
-        $this->chainName = $event->chainName();
-        $this->chain = $event->chain();
+        $this->name = $event->chainName();
+        $this->address = $event->address();
         $this->price = $event->price();
         $this->highPrice = $event->highPrice();
 
     }
 
-    public function id(): Id
+    public function id(): TxnHashId
     {
-        return $this->id;
+        return $this->txnHashId;
     }
 
     public function registerTransaction(): void
     {
         $this->recordAndApply(new SaleTransactionWasRegistered(
-                $this->id,
+                $this->txnHashId,
                 $this->name,
-                $this->exchangeChain,
+                $this->address,
                 $this->price
             )
         );
@@ -78,7 +80,7 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
     {
         $this->name = $event->name();
         $this->price = $event->price();
-        $this->exchangeChain = $event->exchangeChain();
+        $this->address = $event->address();
         $this->isRegistered = true;
     }
 

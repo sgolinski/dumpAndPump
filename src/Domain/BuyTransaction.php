@@ -4,23 +4,21 @@ namespace App\Domain;
 
 use App\Domain\Event\BuyTransactionWasCached;
 use App\Domain\Event\PotentialDumpAndPumpRecognized;
-use App\Domain\Event\SaleTransactionWasCached;
 use App\Domain\ValueObjects\Address;
-use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
+use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\AggregateRoot;
-
-/*TODO class need to be refactored*/
 
 class BuyTransaction extends AggregateRoot implements TransactionInterface
 {
-    private Name $chainName;
-    private Address $txnAddress;
-    private ExchangeChain $chain;
-    private Price $price;
+    private TxnHashId $txnHashId;
+    private Address $fromAddress;
     private Id $id;
+    private Name $chainName;
+    private Price $price;
+
 
     public function __construct(
         Id $id,
@@ -30,19 +28,19 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     }
 
     public static function writeNewFrom(
-        Id            $id,
-        Name          $name,
-        Address       $txnAddress,
-        ExchangeChain $chain,
-        Price         $price,
+        Id        $id,
+        Name      $name,
+        TxnHashId $txnHashId,
+        Address   $fromAddress,
+        Price     $price,
     ): self
     {
         $transaction = new self($id);
 
         $transaction->recordAndApply(new BuyTransactionWasCached(
-            $txnAddress,
+            $txnHashId,
+            $fromAddress,
             $price,
-            $chain,
             $name,
         ));
         return $transaction;
@@ -51,8 +49,8 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     public function applyBuyTransactionWasCached(BuyTransactionWasCached $event): void
     {
         $this->chainName = $event->name();
-        $this->txnAddress= $event->txnAddress();
-        $this->chain = $event->chain();
+        $this->txnHashId = $event->txnHashId();
+        $this->fromAddress = $event->fromAddress();
         $this->price = $event->price();
     }
 

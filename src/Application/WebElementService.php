@@ -3,29 +3,27 @@
 namespace App\Application;
 
 use App\Application\Validation\Allowed;
-use App\Domain\ValueObjects\ExchangeChain;
+use App\Domain\Transaction;
+use App\Domain\ValueObjects\Name;
 use App\Infrastructure\Factory;
 use App\Infrastructure\LiquidityTransactionFactory;
 use App\Infrastructure\Repository\InMemoryRepository;
+use App\Infrastructure\Repository\InMemorySaleTransactionRepository;
 use App\Infrastructure\RouterTransactionFactory;
 use App\Infrastructure\TransactionFactory;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 
 class WebElementService
 {
-    public Factory $factory;
-    public TransactionFactory $transactionFactory;
-    public RouterTransactionFactory $routerTransactionFactory;
-    public LiquidityTransactionFactory $liquidityTransactionFactory;
+    public RouterTransactionFactory $factory;
     public InMemoryRepository $repository;
+    public InMemorySaleTransactionRepository $saleTransactionRepository;
 
-    public function __construct(InMemoryRepository $repository)
+    public function __construct(InMemoryRepository $repository, InMemorySaleTransactionRepository $saleTransactionRepository)
     {
-        $this->factory = new Factory();
-        $this->transactionFactory = new TransactionFactory();
-        $this->routerTransactionFactory = new RouterTransactionFactory();
-        $this->liquidityTransactionFactory = new LiquidityTransactionFactory();
+        $this->factory = new RouterTransactionFactory();
         $this->repository = $repository;
+        $this->saleTransactionRepository = $saleTransactionRepository;
     }
 
     public function transformElementsToTransactions(array $webElements): void
@@ -37,24 +35,42 @@ class WebElementService
 
         foreach ($webElements as $webElement) {
             assert($webElement instanceof RemoteWebElement);
-
             $type = $this->factory->createTypeFrom($webElement);
-            $chain = $this->factory->createExchangeChain($webElement);
+            $tokenName = $this->factory->createTokenName($webElement);
 
             $isPancakeTransaction = $this->checkIfIsPancakeTransaction($type);
-            $isSaleTransaction = $this->checkIfExchangePointSale($chain);
+            $isSaleTransaction = $this->checkIfTokenNameIsExchangeTokenName($tokenName);
 
             if ($isPancakeTransaction && $isSaleTransaction) {
-                $this->routerTransactionFactory->createTxnSaleTransaction($webElement, $chain);
+                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName);
+
+                var_dump($transaction);
+                die;
+                $key = $transaction->id()->asString();
+                if ($this->saleTransactionRepository->isEmpty() || $this->saleTransactionRepository->hasId($key)) {
+                    $this->repository->add($key, $transaction);
+                    continue;
+                }
+
+            } elseif (!$isPancakeTransaction && $isSaleTransaction) {
+                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName);
+                var_dump($transaction);
+                die;
             } elseif ($isPancakeTransaction && !$isSaleTransaction) {
-                $this->routerTransactionFactory->createBuyTransaction($webElement);
+                $transaction = $this->factory->createBuyTransaction($webElement);
+                var_dump($transaction);
+                die;
             } else {
                 $transaction = null;
+            }
+
+            if ($transaction == null) {
+                continue;
             }
         }
     }
 
-    private function checkIfExchangePointSale(ExchangeChain $chain): bool
+    private function checkIfTokenNameIsExchangeTokenName(Name $chain): bool
     {
         if (in_array($chain, Allowed::EXCHANGE_CHAINS)) {
             return true;
@@ -64,6 +80,6 @@ class WebElementService
 
     private function checkIfIsPancakeTransaction(string $type): bool
     {
-        return str_contains($type, 'PancakeSwap V2:');
+        return str_contains(strtolower($type), strtolower('PancakeSwap V2:'));
     }
 }

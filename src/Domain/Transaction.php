@@ -13,7 +13,7 @@ use App\Domain\Event\SaleTransactionWasCached;
 use App\Domain\Event\SaleTransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
 use App\Domain\Event\TransactionWasSent;
-use App\Domain\ValueObjects\ExchangeChain;
+use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Holders;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
@@ -27,7 +27,7 @@ class Transaction extends AggregateRoot
     public Id $id;
     public Name $name;
     public Price $price;
-    public ExchangeChain $exchangeChain;
+    public Name $exchangeChain;
     private Holders $holders;
     private int $repetitions;
     private bool $completed;
@@ -55,7 +55,7 @@ class Transaction extends AggregateRoot
     public static function writeNewFrom(
         Id            $id,
         Price         $price,
-        ExchangeChain $chain
+        Name $chain
     ): self
     {
         $transaction = new self($id);
@@ -78,7 +78,7 @@ class Transaction extends AggregateRoot
         return $this->price;
     }
 
-    public function noticeRepetitions(Price $price, ExchangeChain $chain): void
+    public function noticeRepetitions(Price $price, Name $chain): void
     {
         $this->recordAndApply(new TransactionWasRepeated($price, $chain));
     }
@@ -134,7 +134,7 @@ class Transaction extends AggregateRoot
     {
         $this->name = $event->name();
         $this->price = $event->price();
-        $this->exchangeChain = $event->exchangeChain();
+        $this->exchangeChain = $event->address();
         $this->isRegistered = true;
     }
 
@@ -204,31 +204,6 @@ class Transaction extends AggregateRoot
     public function showRepetitions(): int
     {
         return $this->repetitions;
-    }
-
-    public function isCompleted(): bool
-    {
-        return $this->completed;
-    }
-
-    public function isBlacklisted(): bool
-    {
-        return $this->blacklisted;
-    }
-
-    public function isSent(): bool
-    {
-        return $this->isSent;
-    }
-
-    public function isDumpAndPump(): bool
-    {
-        return $this->isDumpAndPump;
-    }
-
-    public function isRegistered(): bool
-    {
-        return $this->isRegistered;
     }
 
     public function putTransactionOnListed(Transaction $notCompletedTransaction)
