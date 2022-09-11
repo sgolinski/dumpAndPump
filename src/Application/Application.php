@@ -3,6 +3,7 @@
 namespace App\Application;
 
 use App\Application\Validation\Urls;
+use App\Domain\BuyTransaction;
 use App\Domain\TxnSaleTransaction;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
@@ -52,21 +53,21 @@ class Application
         $this->pantherService->saveWebElements($command->url());
         $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
     }
-//    public function noteRepeatedTransactions(): void
-//    {
-//        $this->findRepeatedTransactions(new FindPotentialDumpAndPumpTransaction());
-//    }
-//
-//    private function findRepeatedTransactions(FindPotentialDumpAndPumpTransaction $command): void
-//    {
-//        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
-//
-//        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
-//            assert($potentialDumpAndPumpTransaction instanceof Transaction);
-//            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
-//            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
-//        }
-//    }
+    public function noteRepeatedTransactions(): void
+    {
+        $this->findRepeatedTransactions(new FindPotentialDumpAndPumpTransaction());
+    }
+
+    private function findRepeatedTransactions(FindPotentialDumpAndPumpTransaction $command): void
+    {
+        $potentialDumpAndPumpTransactions = $this->inMemorySaleTransactionRepository->byRepetitions();
+
+        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
+            assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
+            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
+            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
+        }
+    }
 
     public function findBiggestTransactionDrops(): void
     {

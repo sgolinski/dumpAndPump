@@ -3,6 +3,7 @@
 namespace App\Domain;
 
 use App\Domain\Event\BuyTransactionWasCached;
+use App\Domain\Event\PotentialDumpAndPumpRecognized;
 use App\Domain\Event\SaleTransactionWasCached;
 use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Id;
@@ -43,7 +44,7 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
         return $transaction;
     }
 
-    public function applyTransactionWasCached(SaleTransactionWasCached $event): void
+    public function applyBuyTransactionWasCached(BuyTransactionWasCached $event): void
     {
         $this->chainName = $event->chainName();
         $this->chain = $event->chain();
@@ -53,5 +54,10 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     public function id(): Id
     {
         return $this->id;
+    }
+
+    public function recognizePumpAndDump(): void
+    {
+        $this->recordAndApply(new PotentialDumpAndPumpRecognized());
     }
 }

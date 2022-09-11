@@ -4,6 +4,7 @@ namespace App\Domain;
 
 
 use App\Domain\Event\SaleTransactionWasCached;
+use App\Domain\Event\TransactionWasRegistered;
 use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
@@ -47,7 +48,7 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         return $transaction;
     }
 
-    public function applyTransactionWasCached(SaleTransactionWasCached $event): void
+    public function applySaleTransactionWasCached(SaleTransactionWasCached $event): void
     {
         $this->chainName = $event->chainName();
         $this->chain = $event->chain();
