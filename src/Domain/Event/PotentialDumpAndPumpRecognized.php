@@ -2,10 +2,18 @@
 
 namespace App\Domain\Event;
 
-class PotentialDumpAndPumpRecognized
+use App\Infrastructure\DomainEvent;
+use DateTimeImmutable;
+
+class PotentialDumpAndPumpRecognized implements DomainEvent
 {
 
     public function __construct()
     {
+    }
+
+    public function occurredOn(): DateTimeImmutable
+    {
+        return new DateTimeImmutable();
     }
 }
