@@ -73,6 +73,14 @@ class InMemoryRepository implements TransactionRepository
 
     public function add(string $key, TransactionInterface $transaction)
     {
+        if (isset($this->transactionsInCache[$key])) {
+            foreach ($this->transactionsInCache[$key] as $txn) {
+                assert($txn instanceof TransactionInterface);
+                if ($transaction->price()->asFloat() == $txn->price()->asFloat()) {
+                    return;
+                }
+            }
+        }
         $this->transactionsInCache[$key][] = $transaction;
     }
 

@@ -5,7 +5,7 @@ namespace App\Application\Validation;
 class Allowed
 {
     public const NAMES = [
-        'wbnb', 'cake', 'bnb', 'usdc', 'busd', 'usdt', 'fusdt', 'usdp', 'bsc-usd', 'eth', 'cake', 'btcb','cake-l'
+        'wbnb', 'cake', 'bnb', 'usdc', 'busd', 'usdt', 'fusdt', 'usdp', 'bsc-usd', 'eth', 'cake', 'btcb', 'cake-l'
     ];
 
     public const PRICE_PER_NAME =
@@ -20,10 +20,29 @@ class Allowed
             'fusdt' => 1200.00,
             'usdp' => 1200.00,
             'bsc-usd' => 1200.00,
+            'bsc-us' => 1200.00,
             'bscusd' => 1200.00,
             'btcb' => 0.1,
             'eth' => 1.0
         ];
+    public const MIN_PRICE_PER_NAME =
+        [
+            'wbnb' => 0.01,
+            'cake' => 6.00,
+            'cake-l' => 1.00,
+            'bnb' => 0.01,
+            'usdc' => 3.00,
+            'busd' => 3.00,
+            'usdt' => 3.00,
+            'fusdt' => 3.00,
+            'usdp' => 3.00,
+            'bsc-usd' => 3.00,
+            'bsc-us' => 3.00,
+            'bscusd' => 3.00,
+            'btcb' => 0.00015,
+            'eth' => 0.002
+        ];
+
 
     public const STATUSES = [
         'complete',
@@ -41,11 +60,11 @@ class Allowed
         '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82'];
 
     public const EXCHANGE_CHAINS = [
-        'busd', 'bsc-usd', 'wbnb', 'cake-l', 'usdc', 'bnb', 'ustc', 'cake'
+        'busd', 'bsc-usd', 'wbnb', 'cake-l', 'usdc', 'bnb', 'ustc', 'cake', 'bsc-us'
     ];
 
-    public const ROUTER_NAMES =[
-        'Pancake LPs', 'PancakeSwap V2',
+    public const ROUTER_NAMES = [
+        'Pancake LPs', 'PancakeSwap V2', ' PancakeSwap:'
     ];
 
 

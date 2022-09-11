@@ -90,4 +90,8 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         $this->repetitions++;
     }
 
+    public function price(): Price
+    {
+        return $this->price;
+    }
 }

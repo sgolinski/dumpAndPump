@@ -3,20 +3,13 @@
 namespace App\Domain;
 
 use App\Application\Validation\Allowed;
-use App\Domain\Event\HoldersWereAssigned;
 use App\Domain\Event\PotentialDumpAndPumpRecognized;
-use App\Domain\Event\TransactionBlacklisted;
-use App\Domain\Event\TransactionCompleted;
-use App\Domain\Event\TransactionIsListed;
-use App\Domain\Event\TransactionIsNotListed;
 use App\Domain\Event\SaleTransactionWasCached;
 use App\Domain\Event\SaleTransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
-use App\Domain\Event\TransactionWasSent;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Holders;
 use App\Domain\ValueObjects\Id;
-use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Infrastructure\AggregateRoot;
 
@@ -53,9 +46,9 @@ class Transaction extends AggregateRoot
     }
 
     public static function writeNewFrom(
-        Id            $id,
-        Price         $price,
-        Name $chain
+        Id    $id,
+        Price $price,
+        Name  $chain
     ): self
     {
         $transaction = new self($id);

@@ -71,4 +71,9 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     {
         return $this->txnHashId;
     }
+
+    public function price(): Price
+    {
+        return $this->price;
+    }
 }
