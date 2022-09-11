@@ -4,6 +4,7 @@ namespace App\Application;
 
 use App\Application\Validation\Urls;
 use App\Domain\BuyTransaction;
+use App\Domain\Event\FindPotentialDumpAndPumpTransaction;
 use App\Domain\TxnSaleTransaction;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
