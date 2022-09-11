@@ -6,6 +6,7 @@ use App\Domain\ValueObjects\Address;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
+use App\Domain\ValueObjects\Type;
 use App\Infrastructure\DomainEvent;
 use DateTimeImmutable;
 
@@ -15,18 +16,21 @@ class BuyTransactionWasCached implements DomainEvent
     private TxnHashId $txnHashId;
     private Price $price;
     private Address $fromAddress;
+    private Type $type;
 
     public function __construct(
         TxnHashId $txnHashId,
         Address   $fromAddress,
         Price     $price,
-        Name      $name
+        Name      $name,
+        Type      $type,
     )
     {
         $this->txnHashId = $txnHashId;
         $this->fromAddress = $fromAddress;
         $this->price = $price;
         $this->name = $name;
+        $this->type = $type;
     }
 
     public function occurredOn(): DateTimeImmutable

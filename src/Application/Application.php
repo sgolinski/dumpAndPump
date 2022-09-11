@@ -5,6 +5,7 @@ namespace App\Application;
 use App\Application\Validation\Urls;
 use App\Domain\BuyTransaction;
 use App\Domain\Event\FindPotentialDumpAndPumpTransaction;
+use App\Domain\TransactionInterface;
 use App\Domain\TxnSaleTransaction;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
@@ -51,21 +52,21 @@ class Application
         $this->pantherService->saveWebElements($command->url());
         $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
     }
-    public function noteRepeatedSaleTransactions(): void
-    {
-        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
-    }
-
-    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
-    {
-        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
-
-        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
-            assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
-            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
-            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
-        }
-    }
+//    public function noteRepeatedSaleTransactions(): void
+//    {
+//        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
+//    }
+//
+//    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
+//    {
+//        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
+//
+//        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
+//            assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
+//            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
+//            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
+//        }
+//    }
 
     public function findBiggestTransactionDrops(): void
     {
@@ -74,11 +75,12 @@ class Application
 
     private function filterSaleTransactions(FindBiggestSaleTransaction $command): void
     {
-        $saleTransactions = $this->inMemoryRepository->byPrice();
-        foreach ($saleTransactions as $saleTransaction) {
-            assert($saleTransaction instanceof TxnSaleTransaction);
-            $saleTransaction->registerTransaction();
-            $this->transactionRepository->save($command->notComplete(), $saleTransaction);
+        $transactions = $this->inMemoryRepository->all();
+        foreach ($transactions as $transaction) {
+            assert($transaction instanceof TransactionInterface);
+
+            $address = $transaction->filterExchange();
+
         }
     }
 

@@ -9,6 +9,7 @@ use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
+use App\Domain\ValueObjects\Type;
 use App\Infrastructure\AggregateRoot;
 
 class BuyTransaction extends AggregateRoot implements TransactionInterface
@@ -18,6 +19,7 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     private Id $id;
     private Name $name;
     private Price $price;
+    private Type $type;
 
 
     public function __construct(
@@ -33,6 +35,7 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
         TxnHashId $txnHashId,
         Address   $fromAddress,
         Price     $price,
+        Type      $type,
     ): self
     {
         $transaction = new self($id);
@@ -42,6 +45,7 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
             $fromAddress,
             $price,
             $name,
+            $type
         ));
         return $transaction;
     }
@@ -75,5 +79,10 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     public function price(): Price
     {
         return $this->price;
+    }
+
+    public function type(): Type
+    {
+        return $this->type;
     }
 }

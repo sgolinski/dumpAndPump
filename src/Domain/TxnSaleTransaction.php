@@ -2,7 +2,6 @@
 
 namespace App\Domain;
 
-
 use App\Domain\Event\SaleTransactionWasCached;
 use App\Domain\Event\SaleTransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
@@ -10,8 +9,8 @@ use App\Domain\ValueObjects\Address;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
+use App\Domain\ValueObjects\Type;
 use App\Infrastructure\AggregateRoot;
-
 
 class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
 {
@@ -20,6 +19,7 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
     private Name $name;
     private Address $address;
     private Price $price;
+    private Type $type;
 
     public function __construct(
         TxnHashId $id,
@@ -35,6 +35,7 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         Address   $address,
         Price     $price,
         bool      $highPrice,
+        Type      $type
     ): self
     {
         $transaction = new self($id);
@@ -43,7 +44,8 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
             $name,
             $address,
             $price,
-            $highPrice
+            $highPrice,
+            $type
         ));
         return $transaction;
     }
@@ -94,4 +96,10 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
     {
         return $this->price;
     }
+
+    public function type(): Type
+    {
+        return $this->type;
+    }
+
 }

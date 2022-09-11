@@ -35,6 +35,7 @@ class WebElementService
             $price = $this->factory->createPriceFrom($webElement);
 
             $tokenName = $this->factory->createTokenName($webElement);
+            $type = $this->factory->createType($tokenName);
             $isSaleTransaction = $this->checkIfTokenNameIsExchangeTokenName($tokenName->asString());
 
             try {

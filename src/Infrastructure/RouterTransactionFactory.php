@@ -12,6 +12,7 @@ use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
+use App\Domain\ValueObjects\Type;
 use App\Infrastructure\Repository\InMemoryRepository;
 use App\Infrastructure\Repository\RedisRepository;
 use Facebook\WebDriver\Remote\RemoteWebElement;
@@ -142,6 +143,14 @@ class RouterTransactionFactory
             ->getAttribute('href');
 
         return str_replace('/token/', '', $information);
+    }
+
+    public function createType(Name $tokenName): Type
+    {
+        if (in_array($tokenName->asString(), Allowed::NAMES)) {
+            return Type::fromString('exchange');
+        }
+        return Type::fromString('other');
     }
 
     private function createTokenAddress(RemoteWebElement $webElement): string
