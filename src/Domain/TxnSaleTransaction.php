@@ -4,7 +4,8 @@ namespace App\Domain;
 
 
 use App\Domain\Event\SaleTransactionWasCached;
-use App\Domain\Event\TransactionWasRegistered;
+use App\Domain\Event\SaleTransactionWasRegistered;
+use App\Domain\Event\TransactionWasRepeated;
 use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
@@ -64,7 +65,7 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
 
     public function registerTransaction(): void
     {
-        $this->recordAndApply(new TransactionWasRegistered(
+        $this->recordAndApply(new SaleTransactionWasRegistered(
                 $this->id,
                 $this->name,
                 $this->exchangeChain,
@@ -73,7 +74,7 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         );
     }
 
-    public function applyTransactionWasRegistered(TransactionWasRegistered $event): void
+    public function applySaleTransactionWasRegistered(SaleTransactionWasRegistered $event): void
     {
         $this->name = $event->name();
         $this->price = $event->price();
@@ -81,5 +82,13 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         $this->isRegistered = true;
     }
 
+    public function applyTransactionWasRepeated(TransactionWasRepeated $event): void
+    {
+        if (in_array($event->price()->asFloat(), $this->prices)) {
+            return;
+        }
+        $this->price = Price::fromFloat($this->price->asFloat() + $event->price()->asFloat());
+        $this->repetitions++;
+    }
 
 }

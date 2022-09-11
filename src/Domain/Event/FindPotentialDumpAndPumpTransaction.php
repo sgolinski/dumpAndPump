@@ -4,8 +4,8 @@ namespace App\Domain\Event;
 
 class FindPotentialDumpAndPumpTransaction
 {
-
-    public function __construct()
+    public function notComplete(): string
     {
+        return 'notComplete';
     }
 }

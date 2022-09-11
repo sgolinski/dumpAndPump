@@ -10,7 +10,7 @@ use App\Domain\Event\TransactionCompleted;
 use App\Domain\Event\TransactionIsListed;
 use App\Domain\Event\TransactionIsNotListed;
 use App\Domain\Event\SaleTransactionWasCached;
-use App\Domain\Event\TransactionWasRegistered;
+use App\Domain\Event\SaleTransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
 use App\Domain\Event\TransactionWasSent;
 use App\Domain\ValueObjects\ExchangeChain;
@@ -121,7 +121,7 @@ class Transaction extends AggregateRoot
 
     public function registerTransaction(): void
     {
-        $this->recordAndApply(new TransactionWasRegistered(
+        $this->recordAndApply(new SaleTransactionWasRegistered(
                 $this->id,
                 $this->name,
                 $this->exchangeChain,
@@ -130,7 +130,7 @@ class Transaction extends AggregateRoot
         );
     }
 
-    public function applyTransactionWasRegistered(TransactionWasRegistered $event): void
+    public function applyTransactionWasRegistered(SaleTransactionWasRegistered $event): void
     {
         $this->name = $event->name();
         $this->price = $event->price();

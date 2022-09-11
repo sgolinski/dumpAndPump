@@ -9,7 +9,7 @@ use App\Domain\ValueObjects\Price;
 use App\Infrastructure\DomainEvent;
 use DateTimeImmutable;
 
-class TransactionWasRegistered implements DomainEvent
+class SaleTransactionWasRegistered implements DomainEvent
 {
     private Id $id;
     private Name $name;

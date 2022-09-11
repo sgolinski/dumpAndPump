@@ -54,12 +54,12 @@ class Application
         $this->pantherService->saveWebElements($command->url());
         $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
     }
-    public function noteRepeatedTransactions(): void
+    public function noteRepeatedSaleTransactions(): void
     {
-        $this->findRepeatedTransactions(new FindPotentialDumpAndPumpTransaction());
+        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
     }
 
-    private function findRepeatedTransactions(FindPotentialDumpAndPumpTransaction $command): void
+    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
     {
         $potentialDumpAndPumpTransactions = $this->inMemorySaleTransactionRepository->byRepetitions();
 

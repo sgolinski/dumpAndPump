@@ -2,6 +2,8 @@
 
 namespace App\Application;
 
+use App\Application\Validation\Allowed;
+use App\Domain\ValueObjects\ExchangeChain;
 use App\Infrastructure\Factory;
 use App\Infrastructure\LiquidityTransactionFactory;
 use App\Infrastructure\Repository\InMemoryRepository;
@@ -28,34 +30,40 @@ class WebElementService
 
     public function transformElementsToTransactions(array $webElements): void
     {
+        /*
+         * 1. Jesli  type jest równy panckake i chain zawiera sie w exchange chains jest transakcja sprzedaży
+         * 2. Jesli type panckake true i chain nie wskazuje na sprzedaż  buy transaction
+         */
+
         foreach ($webElements as $webElement) {
             assert($webElement instanceof RemoteWebElement);
 
-
             $type = $this->factory->createTypeFrom($webElement);
-            switch ($type) {
-                case str_contains($type, 'PancakeSwap V2:'):
-                    $this->routerTransactionFactory->createTransaction($webElement);
-                    break;
-                case str_contains($type, '0x6f42895f37291ec45f0a307b155229b923ff83f1'):
-                    break;
-//                case str_contains($type, '0x0ed943ce24baebf257488771759f9bf482c39706'):
-//                    //  $this->liquidityTransactionFactory->createTransaction($webElement);
-//                    break;
-//                case str_contains($type, 'PancakeSwap:'):
-//                    break;
+            $chain = $this->factory->createExchangeChain($webElement);
 
-//                case str_contains($type, 'PancakeSwap V2: BSC-USD-'):
-//                    $this->routerTransactionFactory->createTransaction($webElement);
-//                    break;
-//                case str_contains($type, 'Null'):
-//                    //  $this->transactionFactory->createTransaction($webElement);
-//                    break;
-//                case str_contains($type, '0x05ad60d9a2f1aa30ba0cdbaf1e0a0a145fbea16f'):
-//                    break;
+            $isPancakeTransaction = $this->checkIfIsPancakeTransaction($type);
+            $isSaleTransaction = $this->checkIfExchangePointSale($chain);
 
-
+            if ($isPancakeTransaction && $isSaleTransaction) {
+                $this->routerTransactionFactory->createTxnSaleTransaction($webElement, $chain);
+            } elseif ($isPancakeTransaction && !$isSaleTransaction) {
+                $this->routerTransactionFactory->createBuyTransaction($webElement);
+            } else {
+                $transaction = null;
             }
         }
+    }
+
+    private function checkIfExchangePointSale(ExchangeChain $chain): bool
+    {
+        if (in_array($chain, Allowed::EXCHANGE_CHAINS)) {
+            return true;
+        }
+        return false;
+    }
+
+    private function checkIfIsPancakeTransaction(string $type): bool
+    {
+        return str_contains($type, 'PancakeSwap V2:');
     }
 }

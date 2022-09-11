@@ -75,14 +75,14 @@ class Factory
         return Price::fromFloat((float)$information);
     }
 
-    private function createExchangeChain(RemoteWebElement $webElement): ExchangeChain
+    public function createExchangeChain(RemoteWebElement $webElement): ExchangeChain
     {
         $information = $webElement
             ->findElement(WebDriverBy::cssSelector(Selectors::FOR_CHAIN))
             ->getText();
 
         $str = strstr($information, "(");
-        $chain = str_replace(['(', ')'], '', $str);
+        $chain = str_replace(['(', ')','...'], '', $str);
         $chain = str_replace("BSC-US...", "bsc-usd", $chain);
 
 
