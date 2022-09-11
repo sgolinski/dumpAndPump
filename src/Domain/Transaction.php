@@ -3,14 +3,23 @@
 namespace App\Domain;
 
 use App\Application\Validation\Allowed;
+use App\Domain\Event\HoldersWereAssigned;
+use App\Domain\Event\PotentialDumpAndPumpRecognized;
+use App\Domain\Event\SaleTransactionWasRegistered;
+use App\Domain\Event\TransactionBlacklisted;
+use App\Domain\Event\TransactionCompleted;
+use App\Domain\Event\TransactionIsListed;
+use App\Domain\Event\TransactionIsNotListed;
+use App\Domain\Event\TransactionWasCached;
+use App\Domain\Event\TransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
+use App\Domain\Event\TransactionWasSent;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Holders;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Price;
+use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\AggregateRoot;
-
-/*TODO class need to be refactored*/
 
 class Transaction extends AggregateRoot
 {
@@ -19,6 +28,7 @@ class Transaction extends AggregateRoot
     public Price $price;
     public Name $exchangeName;
     private Holders $holders;
+    private TxnHashId $txnHashId;
     private int $repetitions;
     private array $prices;
 
@@ -37,17 +47,21 @@ class Transaction extends AggregateRoot
     }
 
     public static function writeNewFrom(
-        Id    $id,
-        Price $price,
-        Name  $chain
+        Id        $id,
+        Name      $name,
+        Price     $price,
+        Name      $exchangeName,
+        TxnHashId $hashId
     ): self
     {
         $transaction = new self($id);
 
         $transaction->recordAndApply(new TransactionWasCached(
             $id,
-            $chain,
-            $price
+            $name,
+            $price,
+            $exchangeName,
+            $hashId
         ));
         return $transaction;
     }
@@ -77,10 +91,12 @@ class Transaction extends AggregateRoot
         return $transaction;
     }
 
-    public function applyTransactionWasCached(SaleTransactionWasCached $event): void
+    public function applyTransactionWasCached(TransactionWasCached $event): void
     {
-        $this->exchangeName = $event->address();
+        $this->name = $event->name();
+        $this->exchangeName = $event->exchangeName();
         $this->price = $event->price();
+        $this->txnHashId = $event->txnHashId();
         $this->prices[] = $this->price->asFloat();
     }
 
@@ -105,12 +121,7 @@ class Transaction extends AggregateRoot
 
     public function registerTransaction(): void
     {
-        $this->recordAndApply(new SaleTransactionWasRegistered(
-                $this->id,
-                $this->name,
-                $this->exchangeName,
-                $this->price
-            )
+        $this->recordAndApply(new TransactionWasRegistered()
         );
     }
 
@@ -118,7 +129,6 @@ class Transaction extends AggregateRoot
     {
         $this->name = $event->name();
         $this->price = $event->price();
-        $this->exchangeName = $event->address();
         $this->isRegistered = true;
     }
 

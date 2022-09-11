@@ -6,6 +6,7 @@ use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
+use App\Domain\ValueObjects\TxnHashId;
 use App\Infrastructure\DomainEvent;
 use DateTimeImmutable;
 
@@ -13,20 +14,22 @@ class TransactionWasCached implements DomainEvent
 {
     private Id $id;
     private Name $name;
-    private ExchangeChain $chain;
     private Price $price;
+    private Name $exchangeName;
+    private TxnHashId $txnHashId;
 
     public function __construct(
-        Id            $id,
-        Name          $name,
-        ExchangeChain $chain,
-        Price         $price,
+        Id        $id,
+        Name      $name,
+        Price     $price,
+        Name      $exchangeName,
+        TxnHashId $txnHashId,
     )
     {
         $this->id = $id;
         $this->name = $name;
-        $this->chain = $chain;
         $this->price = $price;
+        $this->exchangeName = $exchangeName;
     }
 
     public function id(): Id
@@ -39,11 +42,6 @@ class TransactionWasCached implements DomainEvent
         return $this->name;
     }
 
-    public function chain(): ExchangeChain
-    {
-        return $this->chain;
-    }
-
     public function price(): Price
     {
         return $this->price;
@@ -52,6 +50,19 @@ class TransactionWasCached implements DomainEvent
     public function occurredOn(): DateTimeImmutable
     {
         return new DateTimeImmutable();
+    }
+
+    public function txnHashId(): TxnHashId
+    {
+        return $this->txnHashId;
+    }
+
+    /**
+     * @return Name
+     */
+    public function exchangeName(): Name
+    {
+        return $this->exchangeName;
     }
 
 }

@@ -94,8 +94,8 @@ class Application
                 }
             }
 
-            $transaction = Transaction::writeNewFrom($id, $exchangePrice, $exchangeName);
-            $this->transactionRepository->save($id,);
+            $transaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
+            $this->transactionRepository->save($command->notComplete(), $transaction);
         }
 
     }
