@@ -8,6 +8,7 @@ use App\Domain\Event\FindPotentialDumpAndPumpTransaction;
 use App\Domain\Transaction;
 use App\Domain\TransactionInterface;
 use App\Domain\TxnSaleTransaction;
+use App\Domain\ValueObjects\Holders;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
 
