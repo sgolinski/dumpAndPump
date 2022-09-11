@@ -20,15 +20,9 @@ class Transaction extends AggregateRoot
     public Id $id;
     public Name $name;
     public Price $price;
-    public Name $exchangeChain;
+    public Name $exchangeName;
     private Holders $holders;
     private int $repetitions;
-    private bool $completed;
-    private bool $blacklisted;
-    private bool $isSent;
-    private bool $isDumpAndPump;
-    private bool $isRegistered;
-    private bool $isListed;
     private array $prices;
 
 
@@ -88,7 +82,7 @@ class Transaction extends AggregateRoot
 
     public function applyTransactionWasCached(SaleTransactionWasCached $event): void
     {
-        $this->exchangeChain = $event->address();
+        $this->exchangeName = $event->address();
         $this->price = $event->price();
         $this->prices[] = $this->price->asFloat();
     }
@@ -117,7 +111,7 @@ class Transaction extends AggregateRoot
         $this->recordAndApply(new SaleTransactionWasRegistered(
                 $this->id,
                 $this->name,
-                $this->exchangeChain,
+                $this->exchangeName,
                 $this->price
             )
         );
@@ -127,7 +121,7 @@ class Transaction extends AggregateRoot
     {
         $this->name = $event->name();
         $this->price = $event->price();
-        $this->exchangeChain = $event->address();
+        $this->exchangeName = $event->address();
         $this->isRegistered = true;
     }
 
@@ -168,7 +162,7 @@ class Transaction extends AggregateRoot
 
     public function ensurePriceIsHighEnough(): bool
     {
-        if ($this->price->asFloat() < Allowed::PRICE_PER_NAME[$this->exchangeChain->asString()]) {
+        if ($this->price->asFloat() < Allowed::PRICE_PER_NAME[$this->exchangeName->asString()]) {
             return false;
         }
         return true;
@@ -187,11 +181,11 @@ class Transaction extends AggregateRoot
     public function createMessage(): string
     {
         return "Name: " . $this->name->asString() . PHP_EOL .
-            "Drop Value: -" . $this->price->asFloat() . ' ' . $this->exchangeChain->asString() . PHP_EOL .
+            "Drop Value: -" . $this->price->asFloat() . ' ' . $this->exchangeName->asString() . PHP_EOL .
             "Listing: https://www.coingecko.com/en/coins/" . $this->id()->asString() . PHP_EOL .
             "Poocoin:  https://poocoin.app/tokens/" . $this->id->asString() . PHP_EOL .
             'Token Sniffer: https://tokensniffer.com/token/' . $this->id()->asString() . PHP_EOL .
-            'Chain: ' . $this->exchangeChain->asString() . PHP_EOL;
+            'Chain: ' . $this->exchangeName->asString() . PHP_EOL;
     }
 
     public function showRepetitions(): int

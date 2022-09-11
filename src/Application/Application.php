@@ -5,6 +5,7 @@ namespace App\Application;
 use App\Application\Validation\Urls;
 use App\Domain\BuyTransaction;
 use App\Domain\Event\FindPotentialDumpAndPumpTransaction;
+use App\Domain\Transaction;
 use App\Domain\TransactionInterface;
 use App\Domain\TxnSaleTransaction;
 use App\Domain\ValueObjects\Url;
@@ -76,12 +77,26 @@ class Application
     private function filterSaleTransactions(FindBiggestSaleTransaction $command): void
     {
         $transactions = $this->inMemoryRepository->all();
-        foreach ($transactions as $transaction) {
-            assert($transaction instanceof TransactionInterface);
+        $currentPrice = 0.0;
+        foreach ($transactions as $transactionArr) {
 
-            $address = $transaction->filterExchange();
+            foreach ($transactionArr as $transaction) {
+                assert($transaction instanceof TransactionInterface);
+                if ($transaction->type() == 'exchange' && $transaction > $currentPrice) {
+                    $exchangeName = $transaction->name();
+                    $exchangePrice = $transaction->price();
+                    $txnHash = $transaction->id();
+                    $currentPrice = $transaction->price()->asFloat();
+                } else {
+                    $id = $transaction->id();
+                    $name = $transaction->name();
+                }
+            }
 
+            $transaction = Transaction::writeNewFrom($id,$exchangePrice, $exchangeName);
+            $this->transactionRepository->save($id,);
         }
+
     }
 
     public function completeTransaction(): void

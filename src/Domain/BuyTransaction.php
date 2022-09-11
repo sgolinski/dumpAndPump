@@ -85,4 +85,9 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     {
         return $this->type;
     }
+
+    public function name(): Name
+    {
+        return $this->name;
+    }
 }
