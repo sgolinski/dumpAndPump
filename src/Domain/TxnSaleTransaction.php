@@ -3,8 +3,7 @@
 namespace App\Domain;
 
 use App\Domain\Event\SaleTransactionWasCached;
-use App\Domain\Event\SaleTransactionWasRegistered;
-use App\Domain\Event\TransactionWasRepeated;
+
 use App\Domain\ValueObjects\Address;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
@@ -26,7 +25,6 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
     )
     {
         $this->txnHashId = $id;
-
     }
 
     public static function writeNewFrom(
@@ -63,33 +61,9 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
     {
         return $this->txnHashId;
     }
-
-    public function registerTransaction(): void
+    public function txnHashId(): TxnHashId
     {
-        $this->recordAndApply(new SaleTransactionWasRegistered(
-                $this->txnHashId,
-                $this->name,
-                $this->address,
-                $this->price
-            )
-        );
-    }
-
-    public function applySaleTransactionWasRegistered(SaleTransactionWasRegistered $event): void
-    {
-        $this->name = $event->name();
-        $this->price = $event->price();
-        $this->address = $event->address();
-        $this->isRegistered = true;
-    }
-
-    public function applyTransactionWasRepeated(TransactionWasRepeated $event): void
-    {
-        if (in_array($event->price()->asFloat(), $this->prices)) {
-            return;
-        }
-        $this->price = Price::fromFloat($this->price->asFloat() + $event->price()->asFloat());
-        $this->repetitions++;
+        return $this->txnHashId;
     }
 
     public function price(): Price
@@ -102,4 +76,8 @@ class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
         return $this->type;
     }
 
+    public function name(): Name
+    {
+        return $this->name;
+    }
 }

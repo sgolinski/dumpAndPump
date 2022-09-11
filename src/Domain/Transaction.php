@@ -3,9 +3,6 @@
 namespace App\Domain;
 
 use App\Application\Validation\Allowed;
-use App\Domain\Event\PotentialDumpAndPumpRecognized;
-use App\Domain\Event\SaleTransactionWasCached;
-use App\Domain\Event\SaleTransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Holders;
@@ -47,7 +44,7 @@ class Transaction extends AggregateRoot
     {
         $transaction = new self($id);
 
-        $transaction->recordAndApply(new SaleTransactionWasCached(
+        $transaction->recordAndApply(new TransactionWasCached(
             $id,
             $chain,
             $price

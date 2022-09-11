@@ -53,21 +53,22 @@ class Application
         $this->pantherService->saveWebElements($command->url());
         $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
     }
-//    public function noteRepeatedSaleTransactions(): void
-//    {
-//        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
-//    }
-//
-//    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
-//    {
-//        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
-//
-//        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
-//            assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
-//            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
-//            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
-//        }
-//    }
+
+    public function noteRepeatedSaleTransactions(): void
+    {
+        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
+    }
+
+    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
+    {
+        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
+
+        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
+            assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
+            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
+            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
+        }
+    }
 
     public function findBiggestTransactionDrops(): void
     {
@@ -93,7 +94,7 @@ class Application
                 }
             }
 
-            $transaction = Transaction::writeNewFrom($id,$exchangePrice, $exchangeName);
+            $transaction = Transaction::writeNewFrom($id, $exchangePrice, $exchangeName);
             $this->transactionRepository->save($id,);
         }
 
