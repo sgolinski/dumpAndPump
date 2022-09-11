@@ -2,50 +2,46 @@
 
 namespace App\Domain\Event;
 
-use App\Domain\ValueObjects\Address;
+use App\Domain\ValueObjects\ExchangeChain;
+use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
-use App\Domain\ValueObjects\Type;
 use App\Infrastructure\DomainEvent;
 use DateTimeImmutable;
 
-class SaleTransactionWasCached implements DomainEvent
+class TransactionWasCached implements DomainEvent
 {
-    private Price $price;
-    private Address $address;
+    private Id $id;
     private Name $name;
-    private bool $highPrice;
-    private Type $type;
-
+    private ExchangeChain $chain;
+    private Price $price;
 
     public function __construct(
-        Name    $name,
-        Address $address,
-        Price   $price,
-        bool    $highPrice,
-        Type    $type,
+        Id            $id,
+        Name          $name,
+        ExchangeChain $chain,
+        Price         $price,
     )
     {
-        $this->price = $price;
-        $this->address = $address;
+        $this->id = $id;
         $this->name = $name;
-        $this->highPrice = $highPrice;
-        $this->type = $type;
+        $this->chain = $chain;
+        $this->price = $price;
     }
 
-    public function occurredOn(): DateTimeImmutable
+    public function id(): Id
     {
-        return new DateTimeImmutable();
+        return $this->id;
     }
 
-    public function chainName(): Name
+    public function name(): Name
     {
         return $this->name;
     }
 
-    public function address(): Address
+    public function chain(): ExchangeChain
     {
-        return $this->address;
+        return $this->chain;
     }
 
     public function price(): Price
@@ -53,9 +49,9 @@ class SaleTransactionWasCached implements DomainEvent
         return $this->price;
     }
 
-    public function highPrice(): bool
+    public function occurredOn(): DateTimeImmutable
     {
-        return $this->highPrice;
+        return new DateTimeImmutable();
     }
 
 }

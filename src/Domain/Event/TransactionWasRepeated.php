@@ -2,18 +2,17 @@
 
 namespace App\Domain\Event;
 
-use App\Domain\ValueObjects\Name;
+use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Price;
 use App\Infrastructure\DomainEvent;
 use DateTimeImmutable;
 
-
 class TransactionWasRepeated implements DomainEvent
 {
     private Price $price;
-    private Name $exchangeChain;
+    private ExchangeChain $exchangeChain;
 
-    public function __construct(Price $price, Name $chain)
+    public function __construct(Price $price, ExchangeChain $chain)
     {
         $this->price = $price;
         $this->exchangeChain = $chain;
@@ -24,7 +23,7 @@ class TransactionWasRepeated implements DomainEvent
         return new DateTimeImmutable();
     }
 
-    public function exchangeChain(): Name
+    public function exchangeChain(): ExchangeChain
     {
         return $this->exchangeChain;
     }
@@ -34,5 +33,4 @@ class TransactionWasRepeated implements DomainEvent
     {
         return $this->price;
     }
-
 }
