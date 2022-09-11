@@ -47,7 +47,7 @@ class RouterTransactionFactory
             $highPrice = true;
         }
 
-        $transaction = TxnSaleTransaction::writeNewFrom($txnHashId, $tokenName, $tokenAddress, $price, $highPrice, $type);
+        $transaction = new TxnSaleTransaction($txnHashId, $tokenName, $tokenAddress, $price, $highPrice, $type);
 
         $this->inMemoryRepository->add($transaction->id()->asString(), $transaction);
 
@@ -72,7 +72,7 @@ class RouterTransactionFactory
         $price = $this->createPriceFrom($webElement);
 
 
-        $transaction = BuyTransaction::writeNewFrom($tokenId, $tokenName, $txnHashId, $fromAddress, $price, $type);
+        $transaction = new BuyTransaction($tokenId, $tokenName, $txnHashId, $fromAddress, $price, $type);
         $this->inMemoryRepository->add($transaction->txnHashId()->asString(), $transaction);
         return $transaction;
     }

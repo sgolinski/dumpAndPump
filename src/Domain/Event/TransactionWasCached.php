@@ -2,7 +2,6 @@
 
 namespace App\Domain\Event;
 
-use App\Domain\ValueObjects\ExchangeChain;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;

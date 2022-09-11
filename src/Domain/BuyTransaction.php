@@ -2,17 +2,14 @@
 
 namespace App\Domain;
 
-use App\Domain\Event\BuyTransactionWasCached;
-use App\Domain\Event\PotentialDumpAndPumpRecognized;
 use App\Domain\ValueObjects\Address;
 use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
 use App\Domain\ValueObjects\Type;
-use App\Infrastructure\AggregateRoot;
 
-class BuyTransaction extends AggregateRoot implements TransactionInterface
+class BuyTransaction implements TransactionInterface
 {
     private TxnHashId $txnHashId;
     private Address $fromAddress;
@@ -23,40 +20,20 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
 
 
     public function __construct(
-        Id $id,
-    )
-    {
-        $this->id = $id;
-    }
-
-    public static function writeNewFrom(
         Id        $id,
         Name      $name,
         TxnHashId $txnHashId,
         Address   $fromAddress,
         Price     $price,
         Type      $type,
-    ): self
+    )
     {
-        $transaction = new self($id);
-
-        $transaction->recordAndApply(new BuyTransactionWasCached(
-            $txnHashId,
-            $fromAddress,
-            $price,
-            $name,
-            $type
-        ));
-        return $transaction;
-    }
-
-    public function applyBuyTransactionWasCached(BuyTransactionWasCached $event): void
-    {
-        $this->name = $event->name();
-        $this->txnHashId = $event->txnHashId();
-        $this->fromAddress = $event->fromAddress();
-        $this->price = $event->price();
-        $this->type = $event->type();
+        $this->id = $id;
+        $this->name = $name;
+        $this->txnHashId = $txnHashId;
+        $this->fromAddress = $fromAddress;
+        $this->price = $price;
+        $this->type = $type;
     }
 
     public function id(): Id
@@ -64,10 +41,6 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
         return $this->id;
     }
 
-    public function recognizePumpAndDump(): void
-    {
-        $this->recordAndApply(new PotentialDumpAndPumpRecognized());
-    }
 
     public function txnHashId(): TxnHashId
     {
@@ -87,5 +60,10 @@ class BuyTransaction extends AggregateRoot implements TransactionInterface
     public function name(): Name
     {
         return $this->name;
+    }
+
+    public function fromAddress(): Address
+    {
+        return $this->fromAddress;
     }
 }

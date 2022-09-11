@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '57e9213adc533b0525bdb8730017867bd62584cc',
+        'reference' => '8381c561e9ddd8e6420a72099b96a7c2f3072656',
         'name' => 'szymon/dumpump',
         'dev' => true,
     ),
@@ -656,7 +656,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '57e9213adc533b0525bdb8730017867bd62584cc',
+            'reference' => '8381c561e9ddd8e6420a72099b96a7c2f3072656',
             'dev_requirement' => false,
         ),
         'theseer/tokenizer' => array(

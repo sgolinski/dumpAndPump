@@ -3,7 +3,10 @@
 namespace App\Application;
 
 use App\Application\Validation\RouterSelectors;
+use App\Application\Validation\Selectors;
 use App\Domain\ValueObjects\Url;
+use Exception;
+use InvalidArgumentException;
 use Symfony\Component\Panther\Client;
 
 class PantherService
@@ -26,6 +29,39 @@ class PantherService
             ->children()
             ->getIterator()
             ->getArrayCopy();
+    }
+
+    public function findOneElementOn(Url $url): string
+    {
+        try {
+            $this->refreshClient($url);
+            return $this->client->getCrawler()
+                ->filter(Selectors::FOR_HOLDERS)
+                ->getText();
+
+        } catch (Exception $exception) {
+            $this->client->reload();
+            throw  new InvalidArgumentException('Holders unreachable for address ' . $url->asString());
+        }
+    }
+
+    public function findAttributeElementOn(Url $url): ?string
+    {
+        $status = null;
+        try {
+            $this->refreshClient($url);
+            usleep(3000);
+            $status = $this->client
+                ->getCrawler()
+                ->filter('body')
+                ->getAttribute('data-action-name');
+
+        } catch (Exception $exception) {
+            $this->client->reload();
+            throw  new InvalidArgumentException('Holders unreachable for address ' . $url->asString());
+        }
+        return $status;
+
     }
 
     private function refreshClient(Url $url): void

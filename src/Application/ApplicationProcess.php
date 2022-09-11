@@ -23,9 +23,9 @@ class ApplicationProcess
 
     public function processEvents(): void
     {
-//        $this->application->filterNotListed();
-//        $this->application->completeTransaction();
-//        $this->application->sendNotifications();
+        $this->application->filterNotListed();
+        $this->application->completeTransaction();
+        $this->application->sendNotifications();
         $this->application->transactionRepository->saveDb();
     }
 }

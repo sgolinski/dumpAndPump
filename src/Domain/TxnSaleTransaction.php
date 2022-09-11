@@ -2,64 +2,45 @@
 
 namespace App\Domain;
 
-use App\Domain\Event\SaleTransactionWasCached;
-
 use App\Domain\ValueObjects\Address;
+use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
 use App\Domain\ValueObjects\Type;
-use App\Infrastructure\AggregateRoot;
 
-class TxnSaleTransaction extends AggregateRoot implements TransactionInterface
+
+class TxnSaleTransaction implements TransactionInterface
 {
-    private TxnHashId $txnHashId;
+    private Id $id;
     private bool $highPrice;
     private Name $name;
     private Address $address;
     private Price $price;
     private Type $type;
+    private TxnHashId $txnHashId;
 
     public function __construct(
-        TxnHashId $id,
-    )
-    {
-        $this->txnHashId = $id;
-    }
-
-    public static function writeNewFrom(
         TxnHashId $id,
         Name      $name,
         Address   $address,
         Price     $price,
         bool      $highPrice,
         Type      $type
-    ): self
+    )
     {
-        $transaction = new self($id);
-
-        $transaction->recordAndApply(new SaleTransactionWasCached(
-            $name,
-            $address,
-            $price,
-            $highPrice,
-            $type
-        ));
-        return $transaction;
+        $this->id = Id::fromString($id->asString());
+        $this->name = $name;
+        $this->address = $address;
+        $this->price = $price;
+        $this->highPrice = $highPrice;
+        $this->type = $type;
+        $this->txnHashId = $id;
     }
 
-    public function applySaleTransactionWasCached(SaleTransactionWasCached $event): void
+    public function id(): Id
     {
-        $this->name = $event->chainName();
-        $this->address = $event->address();
-        $this->price = $event->price();
-        $this->highPrice = $event->highPrice();
-        $this->type = $event->type();
-    }
-
-    public function id(): TxnHashId
-    {
-        return $this->txnHashId;
+        return $this->id;
     }
 
     public function txnHashId(): TxnHashId

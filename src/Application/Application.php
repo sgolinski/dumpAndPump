@@ -3,11 +3,8 @@
 namespace App\Application;
 
 use App\Application\Validation\Urls;
-use App\Domain\BuyTransaction;
-use App\Domain\Event\FindPotentialDumpAndPumpTransaction;
 use App\Domain\Transaction;
 use App\Domain\TransactionInterface;
-use App\Domain\TxnSaleTransaction;
 use App\Domain\ValueObjects\Holders;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
@@ -55,22 +52,22 @@ class Application
         $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
     }
 
-//
-//    public function noteRepeatedTransactions(): void
-//    {
-//        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
-//    }
-//
-//    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
-//    {
-//        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
-//
-//        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
-//            assert($potentialDumpAndPumpTransaction instanceof BuyTransaction);
-//            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
-//            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
-//        }
-//    }
+
+    public function noteRepeatedTransactions(): void
+    {
+        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
+    }
+
+    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
+    {
+        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
+
+        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
+            assert($potentialDumpAndPumpTransaction instanceof Transaction);
+            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
+            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
+        }
+    }
 
     public function findBiggestTransactionDrops(): void
     {
@@ -81,25 +78,30 @@ class Application
     {
         $transactions = $this->inMemoryRepository->all();
         $currentPrice = 0.0;
+        $exchangeName = null;
+        $exchangePrice = null;
+        $txnHash = null;
+        $currentPrice = null;
+        $id = null;
+        $name = null;
+
         foreach ($transactions as $transactionArr) {
 
-            $exchangeName = null;
-            $exchangePrice = null;
-            $txnHash = null;
-            $currentPrice = null;
-            $id = null;
-            $name = null;
-
             foreach ($transactionArr as $transaction) {
+                assert($transaction instanceof TransactionInterface);
 
-                if ($transaction == null) {
+                if ($transaction->price() == null) {
                     continue;
                 }
+                if ($transaction->id() == null) {
+                    continue;
+                }
+
                 if ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
                     $exchangeName = $transaction->name();
                     $exchangePrice = $transaction->price();
                     $txnHash = $transaction->txnHashId();
-                    $currentPrice = $transaction->price();
+                    $currentPrice = $transaction->price()->asFloat();
                 }
 
                 if ($transaction->type()->asString() == 'other') {
@@ -107,10 +109,12 @@ class Application
                     $name = $transaction->name();
                 }
             }
+            $currentPrice = 0.0;
+            if ($id !== null && $name !== null && $exchangePrice !== null && $exchangeName !== null && $txnHash !== null) {
+                $transaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
+                $this->transactionRepository->save($command->notComplete(), $transaction);
+            }
 
-            $transaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
-            var_dump($transaction);
-            $this->transactionRepository->save($command->notComplete(), $transaction);
         }
 
     }
@@ -125,7 +129,7 @@ class Application
         $listedTransactions = $this->transactionRepository->findAll($command->listed());
 
         foreach ($listedTransactions as $listedTransaction) {
-            assert($listedTransaction instanceof TxnSaleTransaction);
+            assert($listedTransaction instanceof Transaction);
 
             $currentURl = Url::fromString(Urls::FOR_TRANSACTION . $listedTransaction->id()->asString());
             $elementFrom = $this->pantherService->findOneElementOn($currentURl);
