@@ -111,6 +111,7 @@ class InMemoryRepository implements TransactionRepository
             return;
         }
         $index = null;
+        $this->blockedTransactionsInCache = array_filter($this->blockedTransactionsInCache);
         $counter = count($this->blockedTransactionsInCache);
         for ($i = 0; $i < $counter; $i++) {
             if ($txnHash->asString() == $this->blockedTransactionsInCache[$i]) {
@@ -122,7 +123,6 @@ class InMemoryRepository implements TransactionRepository
         if ($index) {
             unset($this->blockedTransactionsInCache[$index]);
         }
-        $this->blockedTransactionsInCache = array_filter($this->blockedTransactionsInCache);
     }
 
 }
