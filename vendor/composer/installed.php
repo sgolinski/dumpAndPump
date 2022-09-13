@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '8381c561e9ddd8e6420a72099b96a7c2f3072656',
+        'reference' => 'f55d92c6a3434d948c83973fd258778d0bb792f3',
         'name' => 'szymon/dumpump',
         'dev' => true,
     ),
@@ -462,12 +462,12 @@
             'dev_requirement' => true,
         ),
         'sebastian/type' => array(
-            'pretty_version' => '3.1.0',
-            'version' => '3.1.0.0',
+            'pretty_version' => '3.2.0',
+            'version' => '3.2.0.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../sebastian/type',
             'aliases' => array(),
-            'reference' => 'fb44e1cc6e557418387ad815780360057e40753e',
+            'reference' => 'fb3fe09c5f0bae6bc27ef3ce933a1e0ed9464b6e',
             'dev_requirement' => true,
         ),
         'sebastian/version' => array(
@@ -656,7 +656,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '8381c561e9ddd8e6420a72099b96a7c2f3072656',
+            'reference' => 'f55d92c6a3434d948c83973fd258778d0bb792f3',
             'dev_requirement' => false,
         ),
         'theseer/tokenizer' => array(

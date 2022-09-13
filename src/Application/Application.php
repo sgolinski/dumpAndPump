@@ -91,14 +91,12 @@ class Application
             $name = null;
             foreach ($transactionArr as $transaction) {
                 assert($transaction instanceof TransactionInterface);
-
                 if ($transaction->name()->asString() == 'cake-l') {
                     $exchangeName = $transaction->name();
                     $exchangePrice = $transaction->price();
                     $txnHash = $transaction->txnHashId();
                     $id = $transaction->id();
-                    if (isset($exchangeName) && isset($exchangePrice) && isset($txnHash) && isset($id)) {
-
+                    if ($exchangeName !== null && $exchangePrice !== null && $txnHash !== null && $id !== null) {
                         $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
                         $this->transactionRepository->save($command->complete(), $newTransaction);
                     }
@@ -113,10 +111,10 @@ class Application
                     $name = $transaction->name();
                 }
             }
-            if (isset($id) && isset($name) && isset($exchangePrice) && isset($exchangeName) && isset($txnHash)) {
+            if (isset($id) && isset($name) && isset($exchangePrice) && isset($exchangeName) && isset($txnHash) && $name->asString() != $exchangeName->asString()) {
                 $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
                 $this->transactionRepository->save($command->notComplete(), $newTransaction);
-            } elseif (isset($exchangePrice) && isset($exchangeName)) {
+            } elseif (isset($exchangePrice) && isset($exchangeName) && $name->asString() != $exchangeName->asString()) {
                 $isPriceHighEnough = $this->ensurePriceIsHighEnoughToList($exchangePrice, $exchangeName);
                 if ($isPriceHighEnough) {
                     $newTransaction = Transaction::writeNewFrom(Id::fromString($txnHash->asString()), $exchangeName, $exchangePrice, $exchangeName, $txnHash);
