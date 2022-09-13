@@ -41,6 +41,7 @@ class RouterSelectors
     #tblResult > tbody > tr:nth-child(1) > td:nth-child(9)
 
 
+    #tblResult > tbody > tr:nth-child(8) > td:nth-child(7) > span > a
 
     const  FOR_TO = 'tr > td:nth-child(7)';
     #ContentPlaceHolder1_maintable > div:nth-child(12) > div.col-md-9

@@ -55,33 +55,15 @@ class Application
         $this->service->transformElementsToTransactions($this->pantherService->savedWebElements());
     }
 
-
-    public function noteRepeatedTransactions(): void
-    {
-        $this->findRepeatedSaleTransactions(new FindPotentialDumpAndPumpTransaction());
-    }
-
-    private function findRepeatedSaleTransactions(FindPotentialDumpAndPumpTransaction $command): void
-    {
-        $potentialDumpAndPumpTransactions = $this->inMemoryRepository->byRepetitions();
-
-        foreach ($potentialDumpAndPumpTransactions as $potentialDumpAndPumpTransaction) {
-            assert($potentialDumpAndPumpTransaction instanceof Transaction);
-            $potentialDumpAndPumpTransaction->recognizePumpAndDump();
-            $this->transactionRepository->save($command->notComplete(), $potentialDumpAndPumpTransaction);
-        }
-    }
-
     public function findBiggestTransactionDrops(): void
     {
         $this->filterSaleTransactions(new FindBiggestSaleTransaction());
-
     }
 
     private function filterSaleTransactions(FindBiggestSaleTransaction $command): void
     {
         $transactions = $this->inMemoryRepository->all();
-
+// TODO: REFACTOR !!! mess is causing to many records in redis, which is slowing down whole process
         foreach ($transactions as $transactionArr) {
             $currentPrice = 0.0;
 
@@ -110,13 +92,14 @@ class Application
                     }
                     $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
                     $this->transactionRepository->save($command->complete(), $newTransaction);
-
                     break;
-                } elseif ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
+                } elseif
+                ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
                     $exchangeName = $transaction->name();
                     $exchangePrice = $transaction->price();
                     $txnHash = $transaction->txnHashId();
                     $currentPrice = $transaction->price()->asFloat();
+
                 } elseif ($transaction->type()->asString() == 'other' && $transaction->id() !== null && $transaction->name() !== null) {
                     $id = $transaction->id();
                     $name = $transaction->name();

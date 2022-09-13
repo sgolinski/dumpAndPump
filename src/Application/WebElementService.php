@@ -21,7 +21,6 @@ class WebElementService
     {
         $this->repository = $repository;
         $this->factory = new RouterTransactionFactory($this->repository);
-
     }
 
     public function transformElementsToTransactions(array $webElements): void
@@ -33,44 +32,30 @@ class WebElementService
 
             $price = $this->factory->createPriceFrom($webElement);
             $tokenName = $this->factory->createTokenName($webElement);
-            $transactionType = $this->factory->createType($tokenName);
+            $type = $this->factory->createFromType($tokenName);
             $txnHash = $this->factory->createTxnHash($webElement);
 
-            if ($transactionType->asString() === 'exchange') {
+            if ($type->asString() === 'exchange') {
                 $isHighEnough = $this->ensurePriceIsHigherThenMinimum($price, $tokenName);
-                if ($isHighEnough) {
-                    $this->repository->removeFromBlocked($txnHash);
-                } else {
+                if (!$isHighEnough) {
                     $this->repository->addToBlocked($txnHash);
                     continue;
                 }
             }
 
-            $router = $this->factory->findRouterNameFrom($webElement);
-            $transactionTypePancake = $this->createTransactionTypePancake($router);
+            $columnToInformation = $this->factory->findToColumn($webElement);
+            $columnFromInformation = $this->factory->findFromColumn($webElement);
 
-            if (!$transactionTypePancake) {
-                $contractType = $this->factory->createTransactionTypeContract($webElement);
-            }
+            $fromTransactionTypePancake = $this->createTransactionTypePancake($columnFromInformation);
+            $toTransactionTypePancake = $this->createTransactionTypePancake($columnToInformation);
 
-            if ($transactionType->asString() == 'exchange') {
-                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price, $transactionType, $txnHash);
+            $fromTransactionTypeContract = $this->getTransactionTypeContract($fromTransactionTypePancake, $columnFromInformation, $webElement);
+            $toTransactionTypeContract = $this->getTransactionTypeContract($toTransactionTypePancake, $columnToInformation, $webElement);
 
-            } elseif ($transactionType->asString() == 'other') {
-                $transaction = $this->factory->createBuyTransaction($webElement, $transactionType, $txnHash, $price, $tokenName);
+            $this->filterTransactions($fromTransactionTypePancake, $toTransactionTypePancake, $fromTransactionTypeContract, $toTransactionTypeContract, $txnHash);
 
-            } else {
-                $transaction = $this->factory->createBuyTransaction($webElement, $transactionType, $txnHash, $price, $tokenName);
-            }
+            $this->createTransaction($type, $webElement, $tokenName, $price, $txnHash);
         }
-    }
-
-    private function checkIfTokenNameIsExchangeTokenName(string $name): bool
-    {
-        if (in_array(strtolower($name), Allowed::EXCHANGE_CHAINS)) {
-            return true;
-        }
-        return false;
     }
 
     private function createTransactionTypePancake(string $type): ?Type
@@ -92,5 +77,40 @@ class WebElementService
             return true;
         }
         return false;
+    }
+
+    private function getTransactionTypeContract(?Type $toTransactionTypePancake, string $columnToInformation, RemoteWebElement $webElement): ?Type
+    {
+        if (!$toTransactionTypePancake) {
+            if (str_contains($columnToInformation, '0x')) {
+                return $this->factory->createTransactionTypeContract($webElement);
+            }
+            if (str_contains($columnToInformation, 'Null')) {
+                return Type::fromString('null');
+            }
+        }
+        return null;
+    }
+
+    private function filterTransactions(?Type $fromTransactionTypePancake, ?Type $toTransactionTypePancake, ?Type $fromTransactionTypeContract, ?Type $toTransactionTypeContract, ?TxnHashId $txnHash): void
+    {
+        //TODO FIND MORE CASES WHERE IS NOT NEEDED TO RECORD TRANSACTION
+        if ($fromTransactionTypePancake == null && $toTransactionTypePancake == null) {
+            if (isset($fromTransactionTypeContract) && $fromTransactionTypeContract->asString() == 'null'
+                && isset($toTransactionTypeContract) && $toTransactionTypeContract->asString() == 'null') {
+                $this->repository->addToBlocked($txnHash);
+            }
+        }
+    }
+
+    private function createTransaction(Type $type, RemoteWebElement $webElement, Name $tokenName, Price $price, ?TxnHashId $txnHash): void
+    {
+        if ($type->asString() == 'exchange') {
+            $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price, $type, $txnHash);
+        } elseif ($type->asString() == 'other') {
+            $this->factory->createBuyTransaction($webElement, $type, $txnHash, $price, $tokenName);
+        } else {
+            $this->factory->createBuyTransaction($webElement, $type, $txnHash, $price, $tokenName);
+        }
     }
 }

@@ -146,7 +146,7 @@ class RouterTransactionFactory
         return str_replace('/token/', '', $information);
     }
 
-    public function createType(Name $tokenName): Type
+    public function createFromType(Name $tokenName): Type
     {
         if (in_array($tokenName->asString(), Allowed::NAMES)) {
             return Type::fromString('exchange');
@@ -163,19 +163,14 @@ class RouterTransactionFactory
         } catch (Exception $exception) {
             return null;
         }
-        return Type::fromString($type);
+        return Type::fromString(strtolower($type));
     }
 
-    private function createTokenAddress(RemoteWebElement $webElement): string
+    public function findToColumn(RemoteWebElement $webElement): string
     {
-        $information = $webElement
-            ->findElement(WebDriverBy::cssSelector(RouterSelectors::TOKEN_ATTR))
+        return $webElement
+            ->findElement(WebDriverBy::cssSelector(RouterSelectors::FOR_TO))
             ->getText();
-
-        $str = strstr($information, "(");
-        $chain = str_replace(['(', ')'], '', $str);
-
-        return strtolower($chain);
     }
 
     public function createTxnHash(RemoteWebElement $webElement): ?TxnHashId
@@ -201,19 +196,7 @@ class RouterTransactionFactory
         return Name::fromString(strtolower($chain));
     }
 
-    private function createTokenNameForBuyTransaction(RemoteWebElement $webElement): string
-    {
-        $information = $webElement
-            ->findElement(WebDriverBy::cssSelector(RouterSelectors::TOKEN_ATTR))
-            ->getText();
-
-        $str = strstr($information, "(");
-        $chain = str_replace(['(', ')'], '', $str);
-
-        return strtolower($chain);
-    }
-
-    public function findRouterNameFrom(RemoteWebElement $webElement): string
+    public function findFromColumn(RemoteWebElement $webElement): string
     {
         $transactionType = $webElement
             ->findElement(WebDriverBy::cssSelector(RouterSelectors::FROM_TEXT))
