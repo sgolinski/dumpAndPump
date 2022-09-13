@@ -3,13 +3,16 @@
 namespace App\Domain\ValueObjects;
 
 
+use App\Application\Validation\Allowed;
+use InvalidArgumentException;
+
 class Name
 {
     private string $name;
 
     private function __construct(string $name)
     {
-       // $this->ensureNameIsAllowed($name);
+        // $this->ensureNameIsAllowed($name);
         $this->name = $name;
     }
 
@@ -23,10 +26,12 @@ class Name
         return $this->name;
     }
 
-//    private function ensureNameIsAllowed(string $name): void
-//    {
-//        if (in_array(strtolower($name), Blacklisted::NAMES)) {
-//            throw new InvalidArgumentException('Name is blacklisted');
-//        }
-//    }
+    public function ensureNameIsAllowed(): bool
+    {
+        if (in_array($this->name, Allowed::NAMES)) {
+            return true;
+        }
+
+        return false;
+    }
 }

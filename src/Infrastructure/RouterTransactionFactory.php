@@ -33,11 +33,10 @@ class RouterTransactionFactory
         RemoteWebElement $webElement,
         Name             $tokenName,
         Price            $price,
-        Type             $type
+        Type             $type,
+        TxnHashId        $txnHashId
     ): TxnSaleTransaction
     {
-        $txnHash = $this->createTxnHash($webElement);
-        $txnHashId = TxnHashId::fromString(str_replace('/tx/', '', $txnHash));
 
         $tokenAddress = $this->createToken($webElement);
         $tokenAddress = Address::fromString($tokenAddress);
@@ -56,11 +55,10 @@ class RouterTransactionFactory
 
     public function createBuyTransaction(
         RemoteWebElement $webElement,
-        Type             $type
+        Type             $type,
+        TxnHashId        $txnHashId
     ): BuyTransaction
     {
-        $txnHash = $this->createTxnHash($webElement);
-        $txnHashId = TxnHashId::fromString($txnHash);
 
         $fromAddress = $this->createAddressFrom($webElement);
         $fromAddress = Address::fromString($fromAddress);
@@ -71,9 +69,9 @@ class RouterTransactionFactory
         $tokenName = $this->createTokenName($webElement);
         $price = $this->createPriceFrom($webElement);
 
-
         $transaction = new BuyTransaction($tokenId, $tokenName, $txnHashId, $fromAddress, $price, $type);
         $this->inMemoryRepository->add($transaction->txnHashId()->asString(), $transaction);
+
         return $transaction;
     }
 
@@ -168,11 +166,13 @@ class RouterTransactionFactory
         return strtolower($chain);
     }
 
-    private function createTxnHash(RemoteWebElement $webElement): ?string
+    public function createTxnHash(RemoteWebElement $webElement): ?TxnHashId
     {
-        return $webElement
+        $txnHash = $webElement
             ->findElement(WebDriverBy::cssSelector(RouterSelectors::HASH_TXN))
             ->getAttribute('href');
+
+        return TxnHashId::fromString(str_replace('/tx/', '', $txnHash));
     }
 
     public function createTokenName(RemoteWebElement $webElement): Name

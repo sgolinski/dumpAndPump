@@ -4,10 +4,12 @@ namespace App\Infrastructure\Repository;
 
 use App\Domain\Transaction;
 use App\Domain\TransactionInterface;
+use App\Domain\ValueObjects\TxnHashId;
 
 class InMemoryRepository implements TransactionRepository
 {
     private array $transactionsInCache;
+    private array $blockedTransactionsInCache;
 
     public function __construct()
     {
@@ -73,6 +75,11 @@ class InMemoryRepository implements TransactionRepository
 
     public function add(string $key, TransactionInterface $transaction)
     {
+        if (!empty($this->blockedTransactionsInCache)) {
+            if (isset($this->blockedTransactionsInCache[$key])) {
+                return;
+            }
+        }
         if (isset($this->transactionsInCache[$key])) {
             foreach ($this->transactionsInCache[$key] as $txn) {
                 assert($txn instanceof TransactionInterface);
@@ -87,6 +94,29 @@ class InMemoryRepository implements TransactionRepository
     public function remove($key)
     {
         unset($this->transactionsInCache[$key]);
+    }
+
+    public function addToBlocked(TxnHashId $txnHash): void
+    {
+        $this->blockedTransactionsInCache[] = $txnHash->asString();
+    }
+
+    public function removeFromBlocked(TxnHashId $txnHash): void
+    {
+        if (empty($this->blockedTransactionsInCache)) {
+            return;
+        }
+        $index = null;
+        for ($i = 0; $i < count($this->blockedTransactionsInCache); $i++) {
+            if ($txnHash->asString() == $this->blockedTransactionsInCache[$i]) {
+                $index = $i;
+                break;
+            }
+        }
+
+        if ($index) {
+            unset($this->blockedTransactionsInCache[$index]);
+        }
     }
 
 }

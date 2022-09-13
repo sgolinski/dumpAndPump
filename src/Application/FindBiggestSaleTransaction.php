@@ -5,15 +5,15 @@ namespace App\Application;
 class FindBiggestSaleTransaction
 {
     private string $notComplete = 'notComplete';
-    private string $liquidity = 'lp';
+    private string $complete = 'complete';
 
     public function notComplete(): string
     {
         return $this->notComplete;
     }
 
-    public function liquidity(): string
+    public function complete(): string
     {
-        return $this->liquidity;
+        return $this->complete;
     }
 }

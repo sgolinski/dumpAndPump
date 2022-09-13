@@ -2,11 +2,13 @@
 
 namespace App\Application;
 
+use App\Application\Validation\Allowed;
 use App\Application\Validation\Urls;
 use App\Domain\Transaction;
 use App\Domain\TransactionInterface;
 use App\Domain\ValueObjects\Holders;
-use App\Domain\ValueObjects\Id;
+use App\Domain\ValueObjects\Name;
+use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
 use App\Infrastructure\Repository\RedisRepository;
@@ -82,12 +84,11 @@ class Application
         $exchangeName = null;
         $exchangePrice = null;
         $txnHash = null;
-        $currentPrice = null;
         $id = null;
         $name = null;
 
         foreach ($transactions as $transactionArr) {
-            $lastTransaction = null;
+
             $currentPrice = 0.0;
 
             foreach ($transactionArr as $transaction) {
@@ -100,34 +101,29 @@ class Application
                     $txnHash = $transaction->txnHashId();
                     $id = $transaction->id();
                     $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
-                    $this->transactionRepository->save($command->liquidity(), $newTransaction);
+                    $this->transactionRepository->save($command->complete(), $newTransaction);
                     break;
                 } elseif ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
                     $exchangeName = $transaction->name();
                     $exchangePrice = $transaction->price();
                     $txnHash = $transaction->txnHashId();
                     $currentPrice = $transaction->price()->asFloat();
-
-                } elseif ($transaction->type()->asString() == 'other') {
+                } elseif ($transaction->type()->asString() == 'other' && $transaction->id() !== null && $transaction->name() !== null) {
                     $id = $transaction->id();
                     $name = $transaction->name();
                 }
             }
-
-            if ($exchangePrice == null) {
-                continue;
-            } elseif ($id == null) {
-                continue;
-            } else {
-                if ($name == null && $id == null) {
-                    $name = 'other';
-                    $id = Id::fromString($txnHash->asString());
-                }
+            if (isset($id) && isset($name) && isset($exchangePrice) && isset($exchangeName) && isset($txnHash)) {
                 $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
                 $this->transactionRepository->save($command->notComplete(), $newTransaction);
+            } elseif (isset($exchangePrice) && isset($exchangeName)) {
+                $isPriceHighEnough = $this->ensurePriceIsHighEnoughToList($exchangePrice, $exchangeName);
+                if ($isPriceHighEnough) {
+                    $newTransaction = Transaction::writeNewFrom($txnHash, $exchangeName, $exchangePrice, $exchangeName, $txnHash);
+                    $this->transactionRepository->save($command->complete(), $newTransaction);
+                }
             }
         }
-
     }
 
     public function findLiquidityRemoval(): void
@@ -192,8 +188,9 @@ class Application
         $this->transactionRepository->save($command->complete(), $transaction);
         $this->transactionRepository->removeFrom($command->notComplete(), $transaction);
     }
+
     private function putLpTransactionOnListed(
-        Transaction                $transaction,
+        Transaction                     $transaction,
         FillLiquidityRemovalTransaction $command
     ): void
     {
@@ -201,6 +198,7 @@ class Application
         $this->transactionRepository->save($command->listed(), $transaction);
         $this->transactionRepository->removeFrom($command->lp(), $transaction);
     }
+
     public function sendNotifications(): void
     {
         $this->sendNotificationsAboutCompleteTokens(new NotifyOnSlack());
@@ -245,6 +243,16 @@ class Application
             }
             $this->transactionRepository->removeFrom($command->notComplete(), $notCompletedTransaction);
         }
+    }
+
+    private function ensurePriceIsHighEnoughToList(Price $exchangePrice, Name $exchangeName): bool
+    {
+        if (in_array($exchangeName->asString(), Allowed::NAMES)) {
+            if ($exchangePrice->asFloat() > Allowed::PRICE_PER_NAME[$exchangeName->asString()]) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
