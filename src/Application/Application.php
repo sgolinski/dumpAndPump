@@ -6,9 +6,9 @@ use App\Application\Validation\Urls;
 use App\Domain\Transaction;
 use App\Domain\TransactionInterface;
 use App\Domain\ValueObjects\Holders;
+use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Url;
 use App\Infrastructure\Repository\InMemoryRepository;
-
 use App\Infrastructure\Repository\RedisRepository;
 use DateTime;
 use Exception;
@@ -72,12 +72,13 @@ class Application
     public function findBiggestTransactionDrops(): void
     {
         $this->filterSaleTransactions(new FindBiggestSaleTransaction());
+
     }
 
     private function filterSaleTransactions(FindBiggestSaleTransaction $command): void
     {
         $transactions = $this->inMemoryRepository->all();
-        $currentPrice = 0.0;
+
         $exchangeName = null;
         $exchangePrice = null;
         $txnHash = null;
@@ -86,37 +87,65 @@ class Application
         $name = null;
 
         foreach ($transactions as $transactionArr) {
+            $lastTransaction = null;
+            $currentPrice = 0.0;
 
             foreach ($transactionArr as $transaction) {
                 assert($transaction instanceof TransactionInterface);
 
-                if ($transaction->price() == null) {
-                    continue;
-                }
-                if ($transaction->id() == null) {
-                    continue;
-                }
-
-                if ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
+                if ($transaction->name()->asString() == 'cake-l') {
+                    echo $transaction->name()->asString() . PHP_EOL;
+                    $exchangeName = $transaction->name();
+                    $exchangePrice = $transaction->price();
+                    $txnHash = $transaction->txnHashId();
+                    $id = $transaction->id();
+                    $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
+                    $this->transactionRepository->save($command->liquidity(), $newTransaction);
+                    break;
+                } elseif ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
                     $exchangeName = $transaction->name();
                     $exchangePrice = $transaction->price();
                     $txnHash = $transaction->txnHashId();
                     $currentPrice = $transaction->price()->asFloat();
-                }
 
-                if ($transaction->type()->asString() == 'other') {
+                } elseif ($transaction->type()->asString() == 'other') {
                     $id = $transaction->id();
                     $name = $transaction->name();
                 }
             }
-            $currentPrice = 0.0;
-            if ($id !== null && $name !== null && $exchangePrice !== null && $exchangeName !== null && $txnHash !== null) {
-                $transaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
-                $this->transactionRepository->save($command->notComplete(), $transaction);
-            }
 
+            if ($exchangePrice == null) {
+                continue;
+            } elseif ($id == null) {
+                continue;
+            } else {
+                if ($name == null && $id == null) {
+                    $name = 'other';
+                    $id = Id::fromString($txnHash->asString());
+                }
+                $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
+                $this->transactionRepository->save($command->notComplete(), $newTransaction);
+            }
         }
 
+    }
+
+    public function findLiquidityRemoval(): void
+    {
+        $this->findLiquidityRemovedTransactions(new FillLiquidityRemovalTransaction());
+    }
+
+    private function findLiquidityRemovedTransactions(FillLiquidityRemovalTransaction $command): void
+    {
+        $lpTransactions = $this->transactionRepository->findAll($command->lp());
+
+        if (empty($lpTransactions)) {
+            return;
+        }
+
+        foreach ($lpTransactions as $transaction) {
+            $this->putLpTransactionOnListed($transaction, $command);
+        }
     }
 
     public function completeTransaction(): void
@@ -163,7 +192,15 @@ class Application
         $this->transactionRepository->save($command->complete(), $transaction);
         $this->transactionRepository->removeFrom($command->notComplete(), $transaction);
     }
-
+    private function putLpTransactionOnListed(
+        Transaction                $transaction,
+        FillLiquidityRemovalTransaction $command
+    ): void
+    {
+        $transaction->completeLpTransaction();
+        $this->transactionRepository->save($command->listed(), $transaction);
+        $this->transactionRepository->removeFrom($command->lp(), $transaction);
+    }
     public function sendNotifications(): void
     {
         $this->sendNotificationsAboutCompleteTokens(new NotifyOnSlack());
@@ -209,5 +246,6 @@ class Application
             $this->transactionRepository->removeFrom($command->notComplete(), $notCompletedTransaction);
         }
     }
+
 
 }

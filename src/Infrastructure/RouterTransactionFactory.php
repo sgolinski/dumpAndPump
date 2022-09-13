@@ -134,8 +134,9 @@ class RouterTransactionFactory
         $price = $webElement
             ->findElement(WebDriverBy::cssSelector(RouterSelectors::PRICE))
             ->getText();
-
-        return Price::fromFloat((float)str_replace(',', '', $price));
+        $price = str_replace(',', '', $price);
+        $price = (float)$price;
+        return Price::fromFloat($price);
     }
 
     public function createToken(RemoteWebElement $webElement): string

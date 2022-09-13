@@ -4,10 +4,16 @@ namespace App\Application;
 
 class FindBiggestSaleTransaction
 {
-    private string $status = 'notComplete';
+    private string $notComplete = 'notComplete';
+    private string $liquidity = 'lp';
 
     public function notComplete(): string
     {
-        return $this->status;
+        return $this->notComplete;
+    }
+
+    public function liquidity(): string
+    {
+        return $this->liquidity;
     }
 }

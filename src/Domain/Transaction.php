@@ -10,6 +10,7 @@ use App\Domain\Event\TransactionBlacklisted;
 use App\Domain\Event\TransactionCompleted;
 use App\Domain\Event\TransactionIsListed;
 use App\Domain\Event\TransactionIsNotListed;
+use App\Domain\Event\TransactionLPCompleted;
 use App\Domain\Event\TransactionWasCached;
 use App\Domain\Event\TransactionWasRegistered;
 use App\Domain\Event\TransactionWasRepeated;
@@ -157,7 +158,17 @@ class Transaction extends AggregateRoot
         $this->recordAndApply(new TransactionCompleted($this->id));
     }
 
+    public function completeLpTransaction()
+    {
+        $this->recordAndApply(new TransactionLPCompleted($this->id));
+    }
+
     public function applyTransactionCompleted(TransactionCompleted $event): void
+    {
+        $this->completed = true;
+    }
+
+    public function applyTransactionLPCompleted(TransactionLPCompleted $event): void
     {
         $this->completed = true;
     }
@@ -192,6 +203,7 @@ class Transaction extends AggregateRoot
             "Listing: https://www.coingecko.com/en/coins/" . $this->id()->asString() . PHP_EOL .
             "Poocoin:  https://poocoin.app/tokens/" . $this->id->asString() . PHP_EOL .
             'Token Sniffer: https://tokensniffer.com/token/' . $this->id()->asString() . PHP_EOL .
+            'Bscscan https://bscscan.com/tx/' . $this->txnHashId->asString() . PHP_EOL .
             'Chain: ' . $this->exchangeName->asString() . PHP_EOL;
     }
 
@@ -219,4 +231,6 @@ class Transaction extends AggregateRoot
     {
         $this->isListed = false;
     }
+
+
 }

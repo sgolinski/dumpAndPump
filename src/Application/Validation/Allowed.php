@@ -50,7 +50,8 @@ class Allowed
         'blacklisted',
         'sent',
         'listed',
-        'notListed'
+        'notListed',
+        'lp'
     ];
 
     public const ADDRESSES = [
