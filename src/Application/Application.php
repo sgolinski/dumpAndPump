@@ -118,24 +118,6 @@ class Application
         }
     }
 
-    public function findLiquidityRemoval(): void
-    {
-        $this->findLiquidityRemovedTransactions(new FillLiquidityRemovalTransaction());
-    }
-
-    private function findLiquidityRemovedTransactions(FillLiquidityRemovalTransaction $command): void
-    {
-        $lpTransactions = $this->transactionRepository->findAll($command->lp());
-
-        if (empty($lpTransactions)) {
-            return;
-        }
-
-        foreach ($lpTransactions as $transaction) {
-            $this->putLpTransactionOnListed($transaction, $command);
-        }
-    }
-
     public function completeTransaction(): void
     {
         $this->completeListedTransactions(new FillNotCompleteTransaction());
@@ -179,16 +161,6 @@ class Application
         $transaction->completeTransaction();
         $this->transactionRepository->save($command->complete(), $transaction);
         $this->transactionRepository->removeFrom($command->notComplete(), $transaction);
-    }
-
-    private function putLpTransactionOnListed(
-        Transaction                     $transaction,
-        FillLiquidityRemovalTransaction $command
-    ): void
-    {
-        $transaction->completeLpTransaction();
-        $this->transactionRepository->save($command->listed(), $transaction);
-        $this->transactionRepository->removeFrom($command->lp(), $transaction);
     }
 
     public function sendNotifications(): void

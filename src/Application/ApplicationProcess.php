@@ -29,7 +29,6 @@ class ApplicationProcess
         echo 'Start processing events ' . $now->format("m-d-Y H:i:s.u") . PHP_EOL;
         $this->application->filterNotListed();
         $this->application->completeTransaction();
-        $this->application->findLiquidityRemoval();
         $this->application->sendNotifications();
         $this->application->transactionRepository->saveDb();
         $now = DateTime::createFromFormat('U.u', microtime(true));
