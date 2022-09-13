@@ -14,6 +14,7 @@ class InMemoryRepository implements TransactionRepository
     public function __construct()
     {
         $this->transactionsInCache = [];
+        $this->blockedTransactionsInCache = [];
     }
 
     public function byId($id): Transaction
@@ -98,16 +99,20 @@ class InMemoryRepository implements TransactionRepository
 
     public function addToBlocked(TxnHashId $txnHash): void
     {
+        if (in_array($txnHash->asString(), $this->blockedTransactionsInCache)) {
+            return;
+        }
         $this->blockedTransactionsInCache[] = $txnHash->asString();
     }
 
     public function removeFromBlocked(TxnHashId $txnHash): void
     {
-        if (empty($this->blockedTransactionsInCache)) {
+        if (empty($this->blockedTransactionsInCache) && !in_array($txnHash->asString(), $this->blockedTransactionsInCache)) {
             return;
         }
         $index = null;
-        for ($i = 0; $i < count($this->blockedTransactionsInCache); $i++) {
+        $counter = count($this->blockedTransactionsInCache);
+        for ($i = 0; $i < $counter; $i++) {
             if ($txnHash->asString() == $this->blockedTransactionsInCache[$i]) {
                 $index = $i;
                 break;
@@ -117,6 +122,7 @@ class InMemoryRepository implements TransactionRepository
         if ($index) {
             unset($this->blockedTransactionsInCache[$index]);
         }
+        $this->blockedTransactionsInCache = array_filter($this->blockedTransactionsInCache);
     }
 
 }

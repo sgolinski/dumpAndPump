@@ -7,6 +7,7 @@ use App\Application\Validation\Urls;
 use App\Domain\Transaction;
 use App\Domain\TransactionInterface;
 use App\Domain\ValueObjects\Holders;
+use App\Domain\ValueObjects\Id;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\Url;
@@ -81,27 +82,26 @@ class Application
     {
         $transactions = $this->inMemoryRepository->all();
 
-        $exchangeName = null;
-        $exchangePrice = null;
-        $txnHash = null;
-        $id = null;
-        $name = null;
-
         foreach ($transactions as $transactionArr) {
-
             $currentPrice = 0.0;
-
+            $exchangeName = null;
+            $exchangePrice = null;
+            $txnHash = null;
+            $id = null;
+            $name = null;
             foreach ($transactionArr as $transaction) {
                 assert($transaction instanceof TransactionInterface);
 
                 if ($transaction->name()->asString() == 'cake-l') {
-                    echo $transaction->name()->asString() . PHP_EOL;
                     $exchangeName = $transaction->name();
                     $exchangePrice = $transaction->price();
                     $txnHash = $transaction->txnHashId();
                     $id = $transaction->id();
-                    $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
-                    $this->transactionRepository->save($command->complete(), $newTransaction);
+                    if (isset($exchangeName) && isset($exchangePrice) && isset($txnHash) && isset($id)) {
+
+                        $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
+                        $this->transactionRepository->save($command->complete(), $newTransaction);
+                    }
                     break;
                 } elseif ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
                     $exchangeName = $transaction->name();
@@ -119,7 +119,7 @@ class Application
             } elseif (isset($exchangePrice) && isset($exchangeName)) {
                 $isPriceHighEnough = $this->ensurePriceIsHighEnoughToList($exchangePrice, $exchangeName);
                 if ($isPriceHighEnough) {
-                    $newTransaction = Transaction::writeNewFrom($txnHash, $exchangeName, $exchangePrice, $exchangeName, $txnHash);
+                    $newTransaction = Transaction::writeNewFrom(Id::fromString($txnHash->asString()), $exchangeName, $exchangePrice, $exchangeName, $txnHash);
                     $this->transactionRepository->save($command->complete(), $newTransaction);
                 }
             }
