@@ -15,13 +15,13 @@ class RouterSelectors
      */
     public const FROM_ATTR = 'tr > td:nth-child(5) > a';
     public const FROM_TEXT = 'tr > td:nth-child(5)';
-
+    public const FROM_DATA_TYPE = 'tr > td:nth-child(5) > i';
     /**
      * VALUE is used to create price
      */
     public const PRICE = 'tr > td:nth-child(8)';
 
-
+#tblResult > tbody > tr:nth-child(3) > td:nth-child(5) > i
     /**
      * TOKEN us use to create Chain
      */

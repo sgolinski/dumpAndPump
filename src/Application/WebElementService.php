@@ -6,6 +6,7 @@ use App\Application\Validation\Allowed;
 use App\Domain\ValueObjects\Name;
 use App\Domain\ValueObjects\Price;
 use App\Domain\ValueObjects\TxnHashId;
+use App\Domain\ValueObjects\Type;
 use App\Infrastructure\Repository\InMemoryRepository;
 use App\Infrastructure\RouterTransactionFactory;
 use Facebook\WebDriver\Remote\RemoteWebElement;
@@ -32,11 +33,10 @@ class WebElementService
 
             $price = $this->factory->createPriceFrom($webElement);
             $tokenName = $this->factory->createTokenName($webElement);
-            $type = $this->factory->createType($tokenName);
-            $isSaleTransaction = $this->checkIfTokenNameIsExchangeTokenName($tokenName->asString());
+            $transactionType = $this->factory->createType($tokenName);
             $txnHash = $this->factory->createTxnHash($webElement);
 
-            if ($isSaleTransaction) {
+            if ($transactionType->asString() === 'exchange') {
                 $isHighEnough = $this->ensurePriceIsHigherThenMinimum($price, $tokenName);
                 if ($isHighEnough) {
                     $this->repository->removeFromBlocked($txnHash);
@@ -45,21 +45,22 @@ class WebElementService
                     continue;
                 }
             }
+
             $router = $this->factory->findRouterNameFrom($webElement);
-            $isPancakeTransaction = $this->checkIfIsPancakeTransaction($router);
+            $transactionTypePancake = $this->createTransactionTypePancake($router);
 
-            if ($isPancakeTransaction && $isSaleTransaction) {
-                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price, $type, $txnHash);
+            if (!$transactionTypePancake) {
+                $contractType = $this->factory->createTransactionTypeContract($webElement);
+            }
 
-            } elseif (!$isPancakeTransaction && $isSaleTransaction) {
-                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price, $type, $txnHash);
+            if ($transactionType->asString() == 'exchange') {
+                $transaction = $this->factory->createTxnSaleTransaction($webElement, $tokenName, $price, $transactionType, $txnHash);
 
-
-            } elseif ($isPancakeTransaction && !$isSaleTransaction) {
-                $transaction = $this->factory->createBuyTransaction($webElement, $type, $txnHash);
+            } elseif ($transactionType->asString() == 'other') {
+                $transaction = $this->factory->createBuyTransaction($webElement, $transactionType, $txnHash, $price, $tokenName);
 
             } else {
-                $transaction = $this->factory->createBuyTransaction($webElement, $type, $txnHash);
+                $transaction = $this->factory->createBuyTransaction($webElement, $transactionType, $txnHash, $price, $tokenName);
             }
         }
     }
@@ -72,14 +73,14 @@ class WebElementService
         return false;
     }
 
-    private function checkIfIsPancakeTransaction(string $type): bool
+    private function createTransactionTypePancake(string $type): ?Type
     {
         foreach (Allowed::ROUTER_NAMES as $router_name) {
             if (str_contains(strtolower($type), strtolower($router_name))) {
-                return true;
+                return Type::fromString('pancake');
             }
         }
-        return false;
+        return null;
     }
 
     private function ensurePriceIsHigherThenMinimum(Price $price, Name $tokenName): bool

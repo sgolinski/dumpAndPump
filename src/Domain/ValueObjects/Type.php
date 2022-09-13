@@ -20,4 +20,5 @@ class Type
     {
         return $this->type;
     }
+
 }

@@ -15,6 +15,7 @@ use App\Domain\ValueObjects\TxnHashId;
 use App\Domain\ValueObjects\Type;
 use App\Infrastructure\Repository\InMemoryRepository;
 use App\Infrastructure\Repository\RedisRepository;
+use Exception;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 
@@ -56,7 +57,9 @@ class RouterTransactionFactory
     public function createBuyTransaction(
         RemoteWebElement $webElement,
         Type             $type,
-        TxnHashId        $txnHashId
+        TxnHashId        $txnHashId,
+        Price            $price,
+        Name             $tokenName
     ): BuyTransaction
     {
 
@@ -65,9 +68,6 @@ class RouterTransactionFactory
 
         $tokenId = $this->createToken($webElement);
         $tokenId = Id::fromString($tokenId);
-
-        $tokenName = $this->createTokenName($webElement);
-        $price = $this->createPriceFrom($webElement);
 
         $transaction = new BuyTransaction($tokenId, $tokenName, $txnHashId, $fromAddress, $price, $type);
         $this->inMemoryRepository->add($transaction->txnHashId()->asString(), $transaction);
@@ -152,6 +152,18 @@ class RouterTransactionFactory
             return Type::fromString('exchange');
         }
         return Type::fromString('other');
+    }
+
+    public function createTransactionTypeContract(RemoteWebElement $webElement): ?Type
+    {
+        try {
+            $type = $webElement
+                ->findElement(WebDriverBy::cssSelector(RouterSelectors::FROM_DATA_TYPE))
+                ->getAttribute('data-original-title');
+        } catch (Exception $exception) {
+            return null;
+        }
+        return Type::fromString($type);
     }
 
     private function createTokenAddress(RemoteWebElement $webElement): string

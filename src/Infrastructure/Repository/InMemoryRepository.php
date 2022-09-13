@@ -5,6 +5,8 @@ namespace App\Infrastructure\Repository;
 use App\Domain\Transaction;
 use App\Domain\TransactionInterface;
 use App\Domain\ValueObjects\TxnHashId;
+use ArrayIterator;
+use SplDoublyLinkedList;
 
 class InMemoryRepository implements TransactionRepository
 {
@@ -111,18 +113,17 @@ class InMemoryRepository implements TransactionRepository
             return;
         }
         $index = null;
-        $this->blockedTransactionsInCache = array_filter($this->blockedTransactionsInCache);
+
         $counter = count($this->blockedTransactionsInCache);
         for ($i = 0; $i < $counter; $i++) {
             if ($txnHash->asString() == $this->blockedTransactionsInCache[$i]) {
                 $index = $i;
-                break;
             }
         }
-
         if ($index) {
             unset($this->blockedTransactionsInCache[$index]);
         }
+        $this->blockedTransactionsInCache = array_filter($this->blockedTransactionsInCache, 'strlen');
     }
 
 }
