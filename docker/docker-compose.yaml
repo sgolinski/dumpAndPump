@@ -20,4 +20,4 @@ services:
     volumes:
       - ./redis/data:/data
     ports:
-      - "6383:6379"
+      - "6385:6379"

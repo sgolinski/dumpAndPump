@@ -1,4 +1,6 @@
 * * * * * php /mnt/app/public/App.php
-* * * * * sleep 10; php /mnt/app/public/ProcessEvents.php
+* * * * * sleep 30;php /mnt/app/public/AppSecRun.php
+* * * * * sleep 15; php /mnt/app/public/ProcessEvents.php
+* * * * * sleep 45; php /mnt/app/public/ProcessEventsSecRun.php
 
 # always remeber the last line of a crontab file must eb an empty line
