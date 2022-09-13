@@ -84,22 +84,33 @@ class Application
 
         foreach ($transactions as $transactionArr) {
             $currentPrice = 0.0;
-            $exchangeName = null;
-            $exchangePrice = null;
-            $txnHash = null;
-            $id = null;
-            $name = null;
+
             foreach ($transactionArr as $transaction) {
                 assert($transaction instanceof TransactionInterface);
                 if ($transaction->name()->asString() == 'cake-l') {
                     $exchangeName = $transaction->name();
-                    $exchangePrice = $transaction->price();
-                    $txnHash = $transaction->txnHashId();
-                    $id = $transaction->id();
-                    if ($exchangeName !== null && $exchangePrice !== null && $txnHash !== null && $id !== null) {
-                        $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
-                        $this->transactionRepository->save($command->complete(), $newTransaction);
+                    if (!isset($exchangeName)) {
+                        break;
                     }
+                    $exchangePrice = $transaction->price();
+                    if (!isset($exchangePrice)) {
+                        break;
+                    }
+                    $txnHash = $transaction->txnHashId();
+                    if (!isset($txnHash)) {
+                        break;
+                    }
+                    $id = $transaction->id();
+                    if (!isset($id)) {
+                        break;
+                    }
+                    $name = $transaction->name();
+                    if (!isset($name)) {
+                        break;
+                    }
+                    $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
+                    $this->transactionRepository->save($command->complete(), $newTransaction);
+
                     break;
                 } elseif ($transaction->type()->asString() == 'exchange' && $transaction->price()->asFloat() > $currentPrice) {
                     $exchangeName = $transaction->name();
@@ -114,7 +125,7 @@ class Application
             if (isset($id) && isset($name) && isset($exchangePrice) && isset($exchangeName) && isset($txnHash) && $name->asString() != $exchangeName->asString()) {
                 $newTransaction = Transaction::writeNewFrom($id, $name, $exchangePrice, $exchangeName, $txnHash);
                 $this->transactionRepository->save($command->notComplete(), $newTransaction);
-            } elseif (isset($exchangePrice) && isset($exchangeName) && $name->asString() != $exchangeName->asString()) {
+            } elseif (isset($exchangePrice) && isset($exchangeName) && isset($txnHash) && isset($name) && $name->asString() != $exchangeName->asString()) {
                 $isPriceHighEnough = $this->ensurePriceIsHighEnoughToList($exchangePrice, $exchangeName);
                 if ($isPriceHighEnough) {
                     $newTransaction = Transaction::writeNewFrom(Id::fromString($txnHash->asString()), $exchangeName, $exchangePrice, $exchangeName, $txnHash);
