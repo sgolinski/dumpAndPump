@@ -1,5 +1,4 @@
 * * * * * php /mnt/app/public/App.php
-* * * * * sleep 50;php /mnt/app/public/AppSecRun.php
 * * * * * sleep 50; php /mnt/app/public/ProcessEvents.php
 
 
