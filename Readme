@@ -1,0 +1,27 @@
+1. SaleTxnTransaction
+2. BuyTransaction
+
+SaleTxnTransaction and Buy transaction contain partialy information which need to have for create transaction
+
+SaleTxnTransaction
+ From : type Pancake
+ To: type Privat, Type Pancake
+ Token: other
+
+BuyTransaction:
+ From: type Private
+ To: type Pancake
+ Token: exchange
+
+From        TO          Token
+privat      privat      USDC     -> transfer
+
+1.
+private     pancake     other    -> transfer
+pancake     other       other    -> transfer
+pancake     pancake     exchange -> buy
+
+2. PRIVAT  PRIVAT - > filter
+
+
+

@@ -45,15 +45,16 @@ class WebElementService
 
             $columnToInformation = $this->factory->findToColumn($webElement);
             $columnFromInformation = $this->factory->findFromColumn($webElement);
-
             $fromTransactionTypePancake = $this->createTransactionTypePancake($columnFromInformation);
             $toTransactionTypePancake = $this->createTransactionTypePancake($columnToInformation);
+            $fromTransactionTypeContract = $this->getFromTransactionTypeContract($fromTransactionTypePancake, $columnFromInformation, $webElement);
+            $toTransactionTypeContract = $this->getToTransactionTypeContract($toTransactionTypePancake, $columnToInformation, $webElement);
 
-            $fromTransactionTypeContract = $this->getTransactionTypeContract($fromTransactionTypePancake, $columnFromInformation, $webElement);
-            $toTransactionTypeContract = $this->getTransactionTypeContract($toTransactionTypePancake, $columnToInformation, $webElement);
+           $isNotAllowed = $this->filterTransactions($fromTransactionTypePancake, $toTransactionTypePancake, $fromTransactionTypeContract, $toTransactionTypeContract, $txnHash);
 
-            $this->filterTransactions($fromTransactionTypePancake, $toTransactionTypePancake, $fromTransactionTypeContract, $toTransactionTypeContract, $txnHash);
-
+            if ($isNotAllowed) {
+                continue;
+            }
             $this->createTransaction($type, $webElement, $tokenName, $price, $txnHash);
         }
     }
@@ -79,11 +80,11 @@ class WebElementService
         return false;
     }
 
-    private function getTransactionTypeContract(?Type $toTransactionTypePancake, string $columnToInformation, RemoteWebElement $webElement): ?Type
+    private function getFromTransactionTypeContract(?Type $toTransactionTypePancake, string $columnToInformation, RemoteWebElement $webElement): ?Type
     {
         if (!$toTransactionTypePancake) {
             if (str_contains($columnToInformation, '0x')) {
-                return $this->factory->createTransactionTypeContract($webElement);
+                return $this->factory->createFromTransactionTypeContract($webElement);
             }
             if (str_contains($columnToInformation, 'Null')) {
                 return Type::fromString('null');
@@ -92,15 +93,35 @@ class WebElementService
         return null;
     }
 
-    private function filterTransactions(?Type $fromTransactionTypePancake, ?Type $toTransactionTypePancake, ?Type $fromTransactionTypeContract, ?Type $toTransactionTypeContract, ?TxnHashId $txnHash): void
+    private function getToTransactionTypeContract(?Type $toTransactionTypePancake, string $columnToInformation, RemoteWebElement $webElement): ?Type
     {
-        //TODO FIND MORE CASES WHERE IS NOT NEEDED TO RECORD TRANSACTION
-        if ($fromTransactionTypePancake == null && $toTransactionTypePancake == null) {
-            if (isset($fromTransactionTypeContract) && $fromTransactionTypeContract->asString() == 'null'
-                && isset($toTransactionTypeContract) && $toTransactionTypeContract->asString() == 'null') {
-                $this->repository->addToBlocked($txnHash);
+        if (!$toTransactionTypePancake) {
+            if (str_contains($columnToInformation, '0x')) {
+                return $this->factory->createToTransactionTypeContract($webElement);
+            }
+            if (str_contains($columnToInformation, 'Null')) {
+                return Type::fromString('null');
             }
         }
+        return null;
+    }
+
+    private function filterTransactions(?Type $fromTransactionTypePancake, ?Type $toTransactionTypePancake, ?Type $fromTransactionTypeContract, ?Type $toTransactionTypeContract, ?TxnHashId $txnHash): bool
+    {
+        //TODO FIND MORE CASES WHERE IS NOT NEEDED TO RECORD TRANSACTION
+        if ($fromTransactionTypePancake == null && $toTransactionTypePancake == null
+            && isset($fromTransactionTypeContract) && isset($toTransactionTypeContract)) {
+
+            if ($fromTransactionTypeContract->asString() == 'null' && $toTransactionTypeContract->asString() == 'null') {
+                $this->repository->addToBlocked($txnHash);
+                return false;
+            }
+            if ($toTransactionTypeContract->asString() == 'privat' && $fromTransactionTypeContract->asString() == 'privat') {
+                $this->repository->addToBlocked($txnHash);
+                return false;
+            }
+        }
+        return true;
     }
 
     private function createTransaction(Type $type, RemoteWebElement $webElement, Name $tokenName, Price $price, ?TxnHashId $txnHash): void

@@ -18,7 +18,7 @@ class RedisRepository
     {
         try {
             $this->client = new Client([
-                'host' => '127.0.0.1'
+                'host' => 'redis'
             ]);
         } catch (Exception $exception) {
             echo 'Not connected';

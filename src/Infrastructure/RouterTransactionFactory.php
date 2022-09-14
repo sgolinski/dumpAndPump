@@ -154,16 +154,58 @@ class RouterTransactionFactory
         return Type::fromString('other');
     }
 
-    public function createTransactionTypeContract(RemoteWebElement $webElement): ?Type
+    public function createFromTransactionTypeContract(RemoteWebElement $webElement): ?Type
     {
         try {
             $type = $webElement
                 ->findElement(WebDriverBy::cssSelector(RouterSelectors::FROM_DATA_TYPE))
                 ->getAttribute('data-original-title');
+
         } catch (Exception $exception) {
-            return null;
+
         }
-        return Type::fromString(strtolower($type));
+        if (isset($type)) {
+            return Type::fromString(strtolower($type));
+        }
+        try {
+            $type = $webElement
+                    ->findElement(WebDriverBy::cssSelector(RouterSelectors::FROM_DATA_EXCEP))
+                    ->getText() . PHP_EOL;
+            if (str_contains($type, '0x')) {
+                $type = 'privat';
+                return Type::fromString($type);
+            }
+        } catch (Exception $exception) {
+
+        }
+        return null;
+    }
+
+    public function createToTransactionTypeContract(RemoteWebElement $webElement): ?Type
+    {
+        try {
+            $type = $webElement
+                ->findElement(WebDriverBy::cssSelector(RouterSelectors::FOR_TO_DATA))
+                ->getAttribute('data-original-title');
+        } catch (Exception $exception) {
+
+        }
+        if (isset($type)) {
+            return Type::fromString(strtolower($type));
+        }
+        try {
+            $type = $webElement
+                    ->findElement(WebDriverBy::cssSelector(RouterSelectors::FOR_TO))
+                    ->getText() . PHP_EOL;
+
+            if (str_contains($type, '0x')) {
+                $type = 'privat';
+                return Type::fromString($type);
+            }
+        } catch (Exception $exception) {
+
+        }
+        return null;
     }
 
     public function findToColumn(RemoteWebElement $webElement): string

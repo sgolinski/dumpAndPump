@@ -5,6 +5,7 @@ namespace App\Application\Validation;
 class RouterSelectors
 {
 
+    #tblResult > tbody > tr:nth-child(1) > td:nth-child(1) > a > i
     /**
      * Txn Hash used as ID in TxnSaleTranasction
      */
@@ -16,6 +17,7 @@ class RouterSelectors
     public const FROM_ATTR = 'tr > td:nth-child(5) > a';
     public const FROM_TEXT = 'tr > td:nth-child(5)';
     public const FROM_DATA_TYPE = 'tr > td:nth-child(5) > i';
+    public const FROM_DATA_EXCEP = 'tr > td:nth-child(5) > a';
     /**
      * VALUE is used to create price
      */
@@ -44,6 +46,7 @@ class RouterSelectors
     #tblResult > tbody > tr:nth-child(8) > td:nth-child(7) > span > a
 
     const  FOR_TO = 'tr > td:nth-child(7)';
+    const FOR_TO_DATA = 'tr > td:nth-child(7) > i';
     #ContentPlaceHolder1_maintable > div:nth-child(12) > div.col-md-9
     const FOR_TXN = ' #ContentPlaceHolder1_maintable > div:nth-child(12) > div.col-md-9 > #wrapperContent';
 
